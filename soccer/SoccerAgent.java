@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 /**
@@ -35,12 +36,15 @@ public class SoccerAgent extends Thread {
 		try {
 			team = args[0];
 			uNit = "0";
-			// host = InetAddress.getByName((args.length > 0) ? args[0] :
+			//host = InetAddress.getByName((args.length > 0) ? args[0] :
 			// "localhost");
-			host = InetAddress.getLocalHost();
-
+			host = InetAddress.getByName("localhost");
+			
+			
 			System.err.println("Connecting to " + host + ":" + port);
 			socket = new DatagramSocket();
+			socket.setSoTimeout(1000);
+			
 
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
@@ -69,12 +73,12 @@ public class SoccerAgent extends Thread {
 				packet = new DatagramPacket(buffer, 4096, host, port);
 				socket.receive(packet);
 				port = packet.getPort();
-				System.err.println(new String(packet.getData()));
-
-				msg = "(move -3 -" + uNit + ")";
+				//System.err.println(new String(packet.getData()));
+				
+				msg = "(move -3 " + uNit + ")";
 				packet = new DatagramPacket(msg.getBytes(), msg.length(), host,
 						port);
-
+				System.err.format("%s sending %s to %s on port %d %n",team,msg,host.toString(), port);
 				socket.send(packet);
 
 			}
