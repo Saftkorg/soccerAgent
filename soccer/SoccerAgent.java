@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketTimeoutException;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 
 /**
@@ -16,89 +16,33 @@ import java.net.UnknownHostException;
 
 public class SoccerAgent extends Thread {
 
-	InetAddress host;
-	static int port = 6000;
-
-	DatagramSocket socket;
-	DatagramPacket packet;
-	String team;
-	String uNit;
-
-	String response;
-	String[] input;
+	Model model;
+	Communicator com;
 
 	/**
 	 * 
 	 * @param args
+	 * @throws SocketException 
+	 * @throws UnknownHostException 
+	 * @throws NumberFormatException 
 	 */
-	public SoccerAgent(String[] args) {
-		// if no parameters use localhost
-		try {
-			team = args[0];
-			uNit = "0";
-			//host = InetAddress.getByName((args.length > 0) ? args[0] :
-			// "localhost");
-			host = InetAddress.getByName("localhost");
-			
-			
-			System.err.println("Connecting to " + host + ":" + port);
-			socket = new DatagramSocket();
-			socket.setSoTimeout(1000);
-			
+	public SoccerAgent(String[] args) throws NumberFormatException, UnknownHostException, SocketException {
 
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-
-			return;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-
-			e.printStackTrace();
-			return;
-		}
-
+		model = new Model(args[0]);
+		com = new Communicator(args[1],Integer.parseInt(args[2]),model);
+		
 	}
 
 	public void run() {
-		String msg = "(init " + team + ")";
-
-		packet = new DatagramPacket(msg.getBytes(), msg.length(), host, port);
-
-		try {
-			socket.send(packet);
-
-			byte[] buffer = new byte[4096];
-			for (int i = 0; i < 400; i++) {
-				packet = new DatagramPacket(buffer, 4096, host, port);
-				socket.receive(packet);
-				port = packet.getPort();
-				//System.err.println(new String(packet.getData()));
-				
-				msg = "(move -3 " + uNit + ")";
-				packet = new DatagramPacket(msg.getBytes(), msg.length(), host,
-						port);
-				System.err.format("%s sending %s to %s on port %d %n",team,msg,host.toString(), port);
-				socket.send(packet);
-
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		String msg = "(init " + model.team + ")";
+		while(com.send(msg)){
+			//TODO check model
+			//TODO make decision
+			//TODO compile message to send
+			msg = "(move -3 4)";
+			break;
 		}
-		socket.close();
-	}
-
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// (new ControllerFilter(args)).start();
-		String[] first = { "MyTeam" };
-		(new SoccerAgent(first)).start();
-		String[] second = { "MyTheme" };
-		(new SoccerAgent(second)).start();
+		com.quit();
 	}
 
 }
