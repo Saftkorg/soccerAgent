@@ -8,7 +8,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 
 /**
- * 
+ * This is the main class of the RoboCup Soccer Agent
  * @author Gavelli, Viktor
  * @author Gomez, Alexander
  * 
