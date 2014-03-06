@@ -45,4 +45,11 @@ public class SoccerAgent extends Thread {
 		com.quit();
 	}
 
+	private String runToBall() {
+		if(model.ballInVision()) {
+			com.move(model.ballPosX, model.ballPosX);
+		} else {
+			com.turn()
+		}
+	}
 }
