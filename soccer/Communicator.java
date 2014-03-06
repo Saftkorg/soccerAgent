@@ -10,7 +10,6 @@ import java.util.Arrays;
 
 public class Communicator {
 
-	
 	private int index;
 	private String msg;
 	
@@ -20,6 +19,7 @@ public class Communicator {
 
 	private DatagramSocket socket;
 	private DatagramPacket packet;
+
 
 	public Communicator(String host, int port, Model model)
 			throws UnknownHostException, SocketException {
@@ -192,7 +192,43 @@ public class Communicator {
 		model.setUnum(Integer.parseInt(msgA[2]));
 	}
 
+
 	void quit() {
 		socket.close();
+	}
+
+	/**
+	 * Only used before the game starts to place the players on their starting
+	 * locations.
+	 * 
+	 * @param x
+	 * @param y
+	 */
+	public void move(double x, double y) {
+		send("(move " + Double.toString(x) + " " + Double.toString(y) + ")");
+	}
+
+	/**
+	 * 
+	 * @param moment
+	 *            degrees turning angle. 90 is 90 degrees right.
+	 */
+	public void turn(double moment) {
+		send("(turn " + Double.toString(moment) + ")");
+	}
+
+	/**
+	 * This is the main movement command used to move the players during a game.
+	 * 
+	 * @param power
+	 *            Double check this: percentage power. 100 is max.
+	 */
+	public void dash(double power) {
+		send("(dash " + Double.toString(power) + ")");
+	}
+
+	public void kick(double power, double direction) {
+		send("(kick " + Double.toString(power) + " "
+				+ Double.toString(direction) + ")");
 	}
 }

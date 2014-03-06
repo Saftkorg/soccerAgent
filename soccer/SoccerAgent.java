@@ -8,7 +8,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 
 /**
- * 
+ * This is the main class of the RoboCup Soccer Agent
  * @author Gavelli, Viktor
  * @author Gomez, Alexander
  * 
@@ -59,4 +59,11 @@ public class SoccerAgent extends Thread {
 		com.quit();
 	}
 
+	private String runToBall() {
+		if(model.ballInVision()) {
+			com.move(model.ballPosX, model.ballPosX);
+		} else {
+			com.turn()
+		}
+	}
 }
