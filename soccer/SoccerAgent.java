@@ -18,6 +18,7 @@ public class SoccerAgent extends Thread {
 
 	Model model;
 	Communicator com;
+	int VERSION = 13;
 
 	/**
 	 * 
@@ -34,14 +35,27 @@ public class SoccerAgent extends Thread {
 	}
 
 	public void run() {
-		String msg = "(init " + model.team + ")";
+		String msg = "(init " + model.getTeam()+ " (version " + VERSION+ "))";
+		int count = 0;
+		com.send(msg);
+		int x = -4;
+		int y = 4;
+		if(model.field_side == 'r'){
+			x = 4;
+		}
+		msg = "(move " + x +" "+ y+")";
 		while(com.send(msg)){
+			msg = null;
 			//TODO check model
 			//TODO make decision
 			//TODO compile message to send
-			msg = "(move -3 4)";
-			break;
+			if(model.time>0){
+				msg = "(move -3 4)";
+			}
+			
+			
 		}
+		com.send("(bye)");
 		com.quit();
 	}
 
