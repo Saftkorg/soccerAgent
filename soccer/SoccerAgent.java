@@ -38,32 +38,43 @@ public class SoccerAgent extends Thread {
 		String msg = "(init " + model.getTeam()+ " (version " + VERSION+ "))";
 		int count = 0;
 		com.send(msg);
-		int x = -4;
+		int x = -20;
 		int y = 4;
 		if(model.field_side == 'r'){
-			x = 4;
+			x = 20;
 		}
 		msg = "(move " + x +" "+ y+")";
+		int lastTime = 0;
 		while(com.send(msg)){
 			msg = null;
 			//TODO check model
 			//TODO make decision
 			//TODO compile message to send
-			if(model.time>0){
-				msg = "(move -3 4)";
+			if(model.time>0 && lastTime != model.time){
+				if(model.ballInVision){
+					msg = "(turn -20)";//"(dash 50.0 15.0)";
+				}else{
+					msg = "(turn -11)";
+				}
+				lastTime = model.time;
+				System.err.println("Sending " +model.getTeam() + " : "+ msg);
 			}
-			
 			
 		}
 		com.send("(bye)");
 		com.quit();
 	}
 
+	/**
+	 * TODO make agent run to ball
+	 * @return
+	 *
 	private String runToBall() {
-		if(model.ballInVision()) {
+		
+		if(model.ballInVision) {
 			com.move(model.ballPosX, model.ballPosX);
 		} else {
 			com.turn()
 		}
-	}
+	}*/
 }

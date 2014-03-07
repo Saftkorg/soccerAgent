@@ -12,6 +12,8 @@ public class Flag {
 	int fromCenter;
 	int distance;
 	int degree;
+	int distanceChange;
+	int degreeChange;
 	
 	public Flag(char name){
 		this.name = name;

@@ -15,7 +15,7 @@ public class Communicator {
 	
 	private InetAddress host;
 	private int port;
-	private Model model;
+	Model model;
 
 	private DatagramSocket socket;
 	private DatagramPacket packet;
@@ -26,6 +26,7 @@ public class Communicator {
 		this.port = port;
 		this.host = InetAddress.getByName(host);
 		this.model = model;
+		
 		System.err.println("Connecting to " + host + ":" + port);
 
 		socket = new DatagramSocket();
@@ -60,9 +61,10 @@ public class Communicator {
 			socket.receive(packet);
 
 			this.msg = new String(buffer);
+			System.err.println(msg);
 			parse();
 
-			//System.err.println(new String(buffer));
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			// e.printStackTrace();
@@ -92,6 +94,10 @@ public class Communicator {
 		
 		model.time(getInt());
 		
+		if(model.time>0){
+			System.err.println("common");
+		}
+		
 		while(index < msg.length() && msg.charAt(index)=='('){
 			index++;
 			String tmp = getString();
@@ -118,8 +124,12 @@ public class Communicator {
 		Ball ball = new Ball();
 		ball.distance = getInt();
 		ball.degree = getInt();
-		ball.distanceChange = getInt();
-		ball.degreeChange = getInt();
+		if(msg.charAt(index-2)!=')'){
+			ball.distanceChange = getInt();
+		}
+		if(msg.charAt(index-2)!=')'){
+			ball.degreeChange = getInt();
+		}
 		model.addBall(ball);
 		System.err.println("ball added");
 	}
@@ -128,12 +138,21 @@ public class Communicator {
 		// TODO Auto-generated method stub
 		String[] props = playerProperties.split("\\s\"|\\s|\"\\s");
 		Player player = new Player();
+		if(props.length>1){
 		player.team = props[1];
-		player.Unum = Integer.parseInt(props[2]);
+		}
+		if(props.length>2){
+			player.Unum = Integer.parseInt(props[2]);
+		}
+		
 		player.distance = getInt();
 		player.degree = getInt();
-		player.distanceChange = getInt();
-		player.degreeChange = getInt();
+		if(msg.charAt(index-2)!=')'){
+			player.distanceChange = getInt();
+		}
+		if(msg.charAt(index-2)!=')'){
+			player.degreeChange = getInt();
+		}
 		model.addPlayer(player);
 		
 	}
@@ -147,6 +166,12 @@ public class Communicator {
 		}
 		f.distance = getInt();
 		f.degree = getInt();
+		if(msg.charAt(index-2)!=')'){
+			f.distanceChange = getInt();
+		}
+		if(msg.charAt(index-2)!=')'){
+			f.degreeChange = getInt();
+		}
 		model.addFlag(f);
 	}
 

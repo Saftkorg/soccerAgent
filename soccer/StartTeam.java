@@ -18,7 +18,7 @@ public class StartTeam {
 		String[] second = { "MyTheme", "localhost", "6000"  };
 		try {
 			(new SoccerAgent(first)).start();
-			//(new SoccerAgent(second)).start();
+			(new SoccerAgent(second)).start();
 			
 			
 			
