@@ -220,43 +220,4 @@ public class Communicator {
 	void quit() {
 		socket.close();
 	}
-
-	/**
-	 * Only used before the game starts to place the players on their starting
-	 * locations.
-	 * 
-	 * @param x
-	 * @param y
-	 */
-	public String move(double x, double y) {
-		return ("(move " + Double.toString(x) + " " + Double.toString(y) + ")");
-	}
-
-	/**
-	 * 
-	 * @param moment
-	 *            degrees turning angle. 90 is 90 degrees right.
-	 */
-	public String turn(double moment) {
-		return ("(turn " + Double.toString(moment) + ")");
-	}
-
-	/**
-	 * This is the main movement command used to move the players during a game.
-	 * 
-	 * @param power
-	 *            Double check this: percentage power. 100 is max.
-	 */
-	public String dash(double power) {
-		return ("(dash " + Double.toString(power) + ")");
-	}
-	
-	public String dash(double power, double direction) {
-		return ("(dash " + Double.toString(power) + " " + Double.toString(direction) + ")");
-	}
-
-	public String kick(double power, double direction) {
-		return ("(kick " + Double.toString(power) + " "
-				+ Double.toString(direction) + ")");
-	}
 }

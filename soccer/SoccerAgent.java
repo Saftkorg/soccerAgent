@@ -39,47 +39,26 @@ public class SoccerAgent extends Thread {
 
 	public void run() {
 		String msg = "(init " + model.getTeam() + " (version " + VERSION + "))";
-		//int count = 0;
+		// int count = 0;
 		com.send(msg);
 		int x = -20;
 		int y = -10;
 
-                /*
-		if(model.field_side == 'r'){
-			x = 20;
-                        y = 10;
-		}*/
-		msg = "(move " + x +" "+ y+")";
+		/*
+		 * if(model.field_side == 'r'){ x = 20; y = 10; }
+		 */
+		msg = move(x, y);
 		int lastTime = 0;
-		while(com.send(msg)){
+		while (com.send(msg)) {
 			msg = null;
-			//TODO check model
-			//TODO make decision
-			//TODO compile message to send
-			if(model.time>0 && lastTime != model.time){
-				
-				if(model.ballInVision){
-                                    System.err.format("Ball at %d degrees %n",model.ball.degree);
-                                    if(model.ball.distance<1){
-                                        msg = "(kick 20 0)";
-                                    }else if(model.ball.degree>20 || model.ball.degree<-20){
-                                        msg = "(turn "+ model.ball.degree + ")";
-                                    }else{
-                                	msg = "(dash 50)";//"(dash 50.0 15.0)";        
-                                    }
-				
-				}else{
-					msg = "(turn -45)";
-				}
+			// TODO check model
+			// TODO make decision
+			// TODO compile message to send
+			if (model.time > 0 && lastTime != model.time) {
+
 				lastTime = model.time;
 
-				/*System.err.println("Sending " +model.getTeam() + " : "+ msg);
-				*/
-				//lastTime = model.time;
-
-				//System.err.println("Sending " +model.getTeam() + " : "+ msg);
-				
-				//goToBall();
+				msg = decideAction();
 
 			}
 		}
@@ -88,37 +67,72 @@ public class SoccerAgent extends Thread {
 	}
 
 	/**
-	 * HoldBall(): Remain stationary while keeping pos- session of the ball in a
+	 * HoldBall(): Remain stationary while keeping possession of the ball in a
 	 * position that is as far away from the opponents as possible.
 	 */
+	private String holdBall() {
+		return turn(45.0); // TODO
+	}
 
 	/**
-	 * PassBall(k): Kick the ball directly towards keeper k. GetOpen(): Move to
-	 * a position that is free from op- ponents and open for a pass from the
-	 * ball's current position (using SPAR (Veloso et al., 1999)).
+	 * PassBall(k): Kick the ball directly towards keeper k.
+	 * 
+	 * @param k
+	 *            index of player to kick the ball towards.
 	 */
+	private String passBall(int k) {
+		return kick(50.0, model.players.get(k).degree); // TODO - obvious
+	}
 
 	/**
-	 * GoToBall(): Intercept a moving ball or move di- rectly towards a
+	 * GetOpen(): Move to a position that is free from opponents and open for a
+	 * pass from the ball's current position (using SPAR (Veloso et al., 1999)).
+	 */
+	private String getOpen() {
+		return turn(-45.0); // TODO - derp
+	}
+
+	/**
+	 * GoToBall(): (TODO - Intercept a moving ball) or move directly towards a
 	 * stationary ball.
+	 * 
+	 * Only call when ball is visible
+	 * TODO - predict expected ball position when the ball is not in vision.
 	 */
-	public String goToBall() { // TODO - Make this method not retarded. Changed it
-								// for testing purposes since the agent doesn's
-								// see the ball
-		if(model.ballInVision) {
-			if (model.ball.distance < 0.1) {
-				System.err.println("Ball distance: " + model.ball.distance);
-				return com.kick(50.0, 0.0);
-			}
-			if(Math.abs(model.ball.degree) <= DEGREE_DELTA) {
-				return com.turn(model.ball.degree);
-			} else {
-				return com.dash(50.0); // TODO - smart power
-			}
-		} else {
-			 return com.turn(10.0);
-			//com.dash(50.0);
+	private String goToBall() { // TODO - Make this method not retarded.
+		if(!model.ballInVision) {
+			System.err.println("Cannot see ball. Don't call goToBall.");
+			return scanField();
 		}
+//		System.err.format("Ball at %d degrees %n", model.ball.degree);
+		if (model.ball.degree > 20 || model.ball.degree < -20) {
+			return turn(model.ball.degree);
+		} else {
+			return dash(75.0);// "(dash 50.0 15.0)";
+		}
+	}
+
+	/**
+	 * kick the ball directly at the goal. TODO - avoid goal keeper.
+	 * 
+	 * @return
+	 */
+	public String goalKick() {
+		return kick(100.0, 0.0); // TODO
+	}
+
+	private String scanField() {
+		return turn(45.0);
+	}
+
+	private String decideAction() {
+		if (model.ballInVision) {
+			if (model.ball.distance < 1) {
+				return kick(75.0, 0.0);
+			}
+			return goToBall();
+		}
+		return scanField();
 	}
 
 	/**
@@ -126,4 +140,43 @@ public class SoccerAgent extends Thread {
 	 * keeper k.
 	 */
 
+	/**
+	 * Only used before the game starts to place the players on their starting
+	 * locations.
+	 * 
+	 * @param x
+	 * @param y
+	 */
+	private String move(double x, double y) {
+		return ("(move " + Double.toString(x) + " " + Double.toString(y) + ")");
+	}
+
+	/**
+	 * 
+	 * @param moment
+	 *            degrees turning angle. 90 is 90 degrees right.
+	 */
+	private String turn(double moment) {
+		return ("(turn " + Double.toString(moment) + ")");
+	}
+
+	/**
+	 * This is the main movement command used to move the players during a game.
+	 * 
+	 * @param power
+	 *            Double check this: percentage power. 100 is max.
+	 */
+	private String dash(double power) {
+		return ("(dash " + Double.toString(power) + ")");
+	}
+
+	private String dash(double power, double direction) {
+		return ("(dash " + Double.toString(power) + " "
+				+ Double.toString(direction) + ")");
+	}
+
+	private String kick(double power, double direction) {
+		return ("(kick " + Double.toString(power) + " "
+				+ Double.toString(direction) + ")");
+	}
 }
