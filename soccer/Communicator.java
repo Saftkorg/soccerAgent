@@ -229,8 +229,8 @@ public class Communicator {
 	 * @param x
 	 * @param y
 	 */
-	public void move(double x, double y) {
-		send("(move " + Double.toString(x) + " " + Double.toString(y) + ")");
+	public String move(double x, double y) {
+		return ("(move " + Double.toString(x) + " " + Double.toString(y) + ")");
 	}
 
 	/**
@@ -238,8 +238,8 @@ public class Communicator {
 	 * @param moment
 	 *            degrees turning angle. 90 is 90 degrees right.
 	 */
-	public void turn(double moment) {
-		send("(turn " + Double.toString(moment) + ")");
+	public String turn(double moment) {
+		return ("(turn " + Double.toString(moment) + ")");
 	}
 
 	/**
@@ -248,12 +248,16 @@ public class Communicator {
 	 * @param power
 	 *            Double check this: percentage power. 100 is max.
 	 */
-	public void dash(double power) {
-		send("(dash " + Double.toString(power) + ")");
+	public String dash(double power) {
+		return ("(dash " + Double.toString(power) + ")");
+	}
+	
+	public String dash(double power, double direction) {
+		return ("(dash " + Double.toString(power) + " " + Double.toString(direction) + ")");
 	}
 
-	public void kick(double power, double direction) {
-		send("(kick " + Double.toString(power) + " "
+	public String kick(double power, double direction) {
+		return ("(kick " + Double.toString(power) + " "
 				+ Double.toString(direction) + ")");
 	}
 }
