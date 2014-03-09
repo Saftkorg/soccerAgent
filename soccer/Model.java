@@ -52,7 +52,7 @@ public class Model {
 	public void addFlag(Flag f) {
 		// TODO Auto-generated method stub
 		flags.add(f);
-		if (f.goal) {
+		if (f.name == 'g') {
 			if ((field_side == 'r' && f.left) || (field_side == 'l' && f.right)) {
 				goalInVision = true;
 				goal = f;
