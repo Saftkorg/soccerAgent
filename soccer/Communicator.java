@@ -82,10 +82,15 @@ public class Communicator {
 		if(msg.startsWith("(see")){
 			seeMsg();
 		}else if(msg.startsWith("(player")){
+                    System.err.println(msg);
 			
 		}else if(msg.startsWith("(init")){
 			initMsg();
-		}
+		}else if(msg.startsWith("(sense_body")){
+                    
+                }else{
+                    System.err.println(msg);
+                }
 		
 	}
 
@@ -117,7 +122,7 @@ public class Communicator {
 	private void addBall() {
 		// TODO Auto-generated method stub
 		Ball ball = new Ball();
-		ball.distance = getInt();
+		ball.distance = getDouble();
 		ball.degree = getInt();
 		if(msg.charAt(index-2)!=')'){
 			ball.distanceChange = getInt();
@@ -202,8 +207,11 @@ public class Communicator {
 	
 	private double getDouble(){
 		String dobe = "";
-		while(msg.charAt(index)!=' '){
+		while(msg.charAt(index)!=' '&& msg.charAt(index)!=')'){
 			dobe += msg.charAt(index);
+			index++;
+		}
+                if(msg.charAt(index)==')'){
 			index++;
 		}
 		index++;

@@ -131,7 +131,7 @@ public class SoccerAgent extends Thread {
 
 	private String decideAction() {
 		if (model.ballInVision) {
-			if (model.ball.distance < 1 && model.goalInVision) {
+			if (model.ball.distance < 0.7 && model.goalInVision) {
 				return goalKick();
 			}
 			return goToBall();
