@@ -30,11 +30,12 @@ public class Communicator {
 		System.err.println("Connecting to " + host + ":" + port);
 
 		socket = new DatagramSocket();
-		socket.setSoTimeout(1000);
+		socket.setSoTimeout(3000);
 	}
 
 	boolean send(String msg) {
 		if (msg != null) {
+                        msg+=(char)0;
 			packet = new DatagramPacket(msg.getBytes(), msg.length(), host,
 					port);
 			try {
@@ -61,7 +62,7 @@ public class Communicator {
 			socket.receive(packet);
 
 			this.msg = new String(buffer);
-			System.err.println(msg);
+			//System.err.println(msg);
 			parse();
 
 			
@@ -94,19 +95,11 @@ public class Communicator {
 		
 		model.time(getInt());
 		
-		if(model.time>0){
-			System.err.println("common");
-		}
 		
 		while(index < msg.length() && msg.charAt(index)=='('){
 			index++;
 			String tmp = getString();
 			switch(tmp.charAt(0)){
-				case('g'):
-				case('l'):
-				case('f'):
-					addFlag(tmp);
-					break;
 				case('p'):
 					addPlayer(tmp);
 					break;
@@ -114,6 +107,8 @@ public class Communicator {
 					addBall();
 					break;
 				default:
+                                    addFlag(tmp);
+                                    break;
 			}
 		}
 		
@@ -131,7 +126,7 @@ public class Communicator {
 			ball.degreeChange = getInt();
 		}
 		model.addBall(ball);
-		System.err.println("ball added");
+		
 	}
 
 	private void addPlayer(String playerProperties) {
@@ -148,7 +143,11 @@ public class Communicator {
 		player.distance = getInt();
 		player.degree = getInt();
 		if(msg.charAt(index-2)!=')'){
-			player.distanceChange = getInt();
+                    if(msg.charAt(index)=='k'){
+                        index+=3;
+                    }else{
+                        player.distanceChange = getInt();
+                    }
 		}
 		if(msg.charAt(index-2)!=')'){
 			player.degreeChange = getInt();
