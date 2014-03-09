@@ -13,12 +13,15 @@ public class Model {
 	List<Flag> flags;
 	List<Player> players;
 	Ball ball;
+        Flag goal;
+        boolean goalInVision;
 	boolean ballInVision;
 	
 	public Model(String team){
 		this.team = team;
 		time = -1;
 		ballInVision = false;
+                goalInVision = false;
 		flags = new LinkedList<Flag>();
 		players = new LinkedList<Player>();
 	}
@@ -39,6 +42,7 @@ public class Model {
 		// TODO Auto-generated method stub
 		time = int1;
 		ballInVision = false;
+                goalInVision = false;
 		flags = new LinkedList<Flag>();
 		players = new LinkedList<Player>();
 		
@@ -46,6 +50,12 @@ public class Model {
 	public void addFlag(Flag f) {
 		// TODO Auto-generated method stub
 		flags.add(f);
+                if(f.goal){
+                    if((field_side=='r' && f.left )||(field_side=='l' && f.right)){
+                        goalInVision = true;
+                        goal = f;
+                    }
+                }
 	}
 	public void addPlayer(Player player) {
 		// TODO Auto-generated method stub
