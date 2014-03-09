@@ -42,11 +42,13 @@ public class SoccerAgent extends Thread {
 		//int count = 0;
 		com.send(msg);
 		int x = -20;
-		int y = 4;
+		int y = -10;
 
+                /*
 		if(model.field_side == 'r'){
 			x = 20;
-		}
+                        y = 10;
+		}*/
 		msg = "(move " + x +" "+ y+")";
 		int lastTime = 0;
 		while(com.send(msg)){
@@ -55,17 +57,30 @@ public class SoccerAgent extends Thread {
 			//TODO make decision
 			//TODO compile message to send
 			if(model.time>0 && lastTime != model.time){
-				/*
+				
 				if(model.ballInVision){
-					msg = "(turn -20)";//"(dash 50.0 15.0)";
+                                    System.err.format("Ball at %d degrees %n",model.ball.degree);
+                                    if(model.ball.distance<1){
+                                        msg = "(kick 20 0)";
+                                    }else if(model.ball.degree>20 || model.ball.degree<-20){
+                                        msg = "(turn "+ model.ball.degree + ")";
+                                    }else{
+                                	msg = "(dash 50)";//"(dash 50.0 15.0)";        
+                                    }
+				
 				}else{
-					msg = "(turn -11)";
+					msg = "(turn -45)";
 				}
 				lastTime = model.time;
-				System.err.println("Sending " +model.getTeam() + " : "+ msg);
+
+				/*System.err.println("Sending " +model.getTeam() + " : "+ msg);
 				*/
-				msg = goToBall();
 				//lastTime = model.time;
+
+				//System.err.println("Sending " +model.getTeam() + " : "+ msg);
+				
+				//goToBall();
+
 			}
 		}
 		com.send("(bye)");
