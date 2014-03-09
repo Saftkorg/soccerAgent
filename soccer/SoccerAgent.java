@@ -114,11 +114,15 @@ public class SoccerAgent extends Thread {
 
 	/**
 	 * kick the ball directly at the goal. TODO - avoid goal keeper.
-	 * 
+	 * Only use when goal is visible
 	 * @return
 	 */
 	public String goalKick() {
-		return kick(100.0, 0.0); // TODO
+		if(!model.goalInVision) {
+			System.err.println("Cannot see goal. Don't try to hit it!");
+			return scanField();
+		}
+		return kick(100.0, model.goal.degree); // TODO
 	}
 
 	private String scanField() {
@@ -127,8 +131,8 @@ public class SoccerAgent extends Thread {
 
 	private String decideAction() {
 		if (model.ballInVision) {
-			if (model.ball.distance < 1) {
-				return kick(75.0, 0.0);
+			if (model.ball.distance < 1 && model.goalInVision) {
+				return goalKick();
 			}
 			return goToBall();
 		}
