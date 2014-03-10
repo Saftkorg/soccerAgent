@@ -1,7 +1,7 @@
 package soccer;
 
 public class Ball {
-	int distance;
+	double distance;
 	int degree;
 	int distanceChange;
 	int degreeChange;
