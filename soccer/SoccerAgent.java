@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Random;
 
 /**
  * This is the main class of the RoboCup Soccer Agent
@@ -21,6 +22,10 @@ public class SoccerAgent extends Thread {
 	Communicator com;
 	int VERSION = 13;
 	private final double DEGREE_DELTA = 20.0;
+	
+	private boolean avoidFKF = false;
+	
+	Random r = new Random();
 
 	/**
 	 * 
@@ -81,7 +86,7 @@ public class SoccerAgent extends Thread {
 	 *            index of player to kick the ball towards.
 	 */
 	private String passBall(int k) {
-		return kick(50.0, model.players.get(k).degree); // TODO - obvious
+		return kick(75.0, model.players.get(k).degree); // TODO - obvious
 	}
 
 	/**
@@ -89,22 +94,27 @@ public class SoccerAgent extends Thread {
 	 * pass from the ball's current position (using SPAR (Veloso et al., 1999)).
 	 */
 	private String getOpen() {
-		return turn(-45.0); // TODO - derp
+		if(!model.ballInVision)
+			return scanField();
+		if(model.ball.degree > 0) {
+			return dash(50.0, model.ball.degree - 180);
+		}
+		return dash(50.0, 180 + model.ball.degree); // TODO - derp
 	}
 
 	/**
 	 * GoToBall(): (TODO - Intercept a moving ball) or move directly towards a
 	 * stationary ball.
 	 * 
-	 * Only call when ball is visible
-	 * TODO - predict expected ball position when the ball is not in vision.
+	 * Only call when ball is visible TODO - predict expected ball position when
+	 * the ball is not in vision.
 	 */
 	private String goToBall() { // TODO - Make this method not retarded.
-		if(!model.ballInVision) {
+		if (!model.ballInVision) {
 			System.err.println("Cannot see ball. Don't call goToBall.");
 			return scanField();
 		}
-//		System.err.format("Ball at %d degrees %n", model.ball.degree);
+		// System.err.format("Ball at %d degrees %n", model.ball.degree);
 		if (model.ball.degree > 20 || model.ball.degree < -20) {
 			return turn(model.ball.degree);
 		} else {
@@ -113,12 +123,13 @@ public class SoccerAgent extends Thread {
 	}
 
 	/**
-	 * kick the ball directly at the goal. TODO - avoid goal keeper.
-	 * Only use when goal is visible
+	 * kick the ball directly at the goal. TODO - avoid goal keeper. Only use
+	 * when goal is visible
+	 * 
 	 * @return
 	 */
 	public String goalKick() {
-		if(!model.goalInVision) {
+		if (!model.goalInVision) {
 			System.err.println("Cannot see goal. Don't try to hit it!");
 			return scanField();
 		}
@@ -131,8 +142,14 @@ public class SoccerAgent extends Thread {
 
 	private String decideAction() {
 		if (model.ballInVision) {
-			if (model.ball.distance < 1 && model.goalInVision) {
-				return goalKick();
+			if (hasBall()) {
+				if (model.goalInVision) {
+					return goalKick();
+				}
+				int k = model.closestFriendlyPlayer();
+				if(k != -1) {
+					passBall(k);
+				}
 			}
 			return goToBall();
 		}
@@ -161,6 +178,7 @@ public class SoccerAgent extends Thread {
 	 *            degrees turning angle. 90 is 90 degrees right.
 	 */
 	private String turn(double moment) {
+		avoidFKF = false;
 		return ("(turn " + Double.toString(moment) + ")");
 	}
 
@@ -180,7 +198,20 @@ public class SoccerAgent extends Thread {
 	}
 
 	private String kick(double power, double direction) {
+		if(avoidFKF) 
+			return faceBall();
+		avoidFKF = true;
 		return ("(kick " + Double.toString(power) + " "
 				+ Double.toString(direction) + ")");
+	}
+
+	private String faceBall() {
+		if(model.ballInVision)
+			return turn(model.ball.degree);
+		return scanField();
+	}
+	
+	public boolean hasBall() {
+		return model.ball.distance < 1;
 	}
 }

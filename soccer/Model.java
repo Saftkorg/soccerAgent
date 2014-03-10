@@ -71,4 +71,31 @@ public class Model {
 		ballInVision = true;
 	}
 
+	public int closestPlayer() {
+		int k = 0;
+		for (int i = 0; i < players.size(); i++) {
+			if (players.get(k).distance > players.get(i).distance) {
+				k = i;
+			}
+		}
+		return k;
+	}
+
+	public int closestFriendlyPlayer() {
+		int k = -1;
+		for (int i = 0; i < players.size(); i++) {
+			if (players.get(i).team.equals(team)) {
+				k = i;
+				break;
+			}
+		}
+		for (int i = k + 1; i < players.size(); i++) {
+			if (players.get(i).team.equals(team)) {
+				if (players.get(k).distance > players.get(i).distance) {
+					k = i;
+				}
+			}
+		}
+		return k;
+	}
 }
