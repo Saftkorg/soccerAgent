@@ -142,6 +142,7 @@ public class SoccerAgent extends Thread {
 
 	private String decideAction() {
 		if (model.ballInVision) {
+
 			if (hasBall()) {
 				if (model.goalInVision) {
 					return goalKick();
@@ -150,6 +151,7 @@ public class SoccerAgent extends Thread {
 				if(k != -1) {
 					passBall(k);
 				}
+
 			}
 			return goToBall();
 		}
