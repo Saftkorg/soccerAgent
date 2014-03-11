@@ -98,4 +98,86 @@ public class Model {
 		}
 		return k;
 	}
+
+	public double[] playersBallDistance() {
+		if (players.size() == 0)
+			return null;
+		if (!ballInVision)
+			return null;
+		double[] ans = new double[players.size()];
+		for (int i = 0; i < players.size(); i++) {
+			ans[i] = distance(ball.degree, ball.distance,
+					players.get(i).degree, players.get(i).distance);
+		}
+		return ans;
+	}
+
+	public int playerClosestToBall() {
+		double[] distances = playersBallDistance();
+		int minDistance = -1;
+		if (distances != null) {
+			minDistance = 0;
+			for (int i = 1; i < distances.length; i++) {
+				if (distances[i] < distances[minDistance]) {
+					minDistance = i;
+				}
+			}
+		}
+		return minDistance;
+	}
+
+	public int friendlyPlayerClosestToBall(double[] distances) {
+		int minDistance = -1;
+		if (distances != null) {
+			for (int i = 0; i < distances.length; i++) {
+				if (players.get(i).team != null
+						&& players.get(i).team.equals(team)) {
+					if (minDistance == -1)
+						minDistance = i;
+					if (distances[i] < distances[minDistance]) {
+						minDistance = i;
+					}
+				}
+
+			}
+		}
+		return minDistance;
+	}
+	
+	public int friendlyPlayerClosestToBall() {
+		double[] distances = playersBallDistance();
+		int minDistance = -1;
+		if (distances != null) {
+			for (int i = 0; i < distances.length; i++) {
+				if (players.get(i).team != null
+						&& players.get(i).team.equals(team)) {
+					if (minDistance == -1)
+						minDistance = i;
+					if (distances[i] < distances[minDistance]) {
+						minDistance = i;
+					}
+				}
+
+			}
+		}
+		return minDistance;
+	}
+
+	/**
+	 * Calculates distance between two points with reference angles and
+	 * distances.
+	 * 
+	 * @param degreeA
+	 * @param distanceA
+	 * @param degreeB
+	 * @param distanceB
+	 * @return
+	 */
+	public double distance(double degreeA, double distanceA, double degreeB,
+			double distanceB) {
+		return Math
+				.sqrt(Math.pow(distanceA, 2) + Math.pow(distanceB, 2) - 2
+						* distanceA * distanceB
+						* Math.cos(Math.abs(degreeA - degreeB)));
+	}
 }

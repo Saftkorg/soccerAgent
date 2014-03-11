@@ -142,7 +142,7 @@ public class SoccerAgent extends Thread {
 	}
 
 	private double wGoalKick = 1.0 - r.nextDouble();
-	private double wPass = 1.0 - r.nextDouble();
+	private double wPass = 100.0 - r.nextDouble();
 	private String decideAction() {
 		if (model.ballInVision) {
 			int k = model.closestFriendlyPlayer();
@@ -168,7 +168,8 @@ public class SoccerAgent extends Thread {
 				}*/
 			}
 			if(k != -1) {
-				if(Math.abs(model.ball.distance - model.players.get(k).distance) < model.ball.distance) {
+				double[] distances = model.playersBallDistance();
+				if(distances[model.friendlyPlayerClosestToBall(distances)] < model.ball.distance) {
 					return getOpen();
 				}
 			}
