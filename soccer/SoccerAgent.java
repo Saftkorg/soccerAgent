@@ -169,6 +169,7 @@ public class SoccerAgent extends Thread {
 			}
 			if(k != -1) {
 				double[] distances = model.playersBallDistance();
+//				System.err.println("Closest friend distance: " + distances[model.friendlyPlayerClosestToBall(distances)] + " My distance: " + model.ball.distance + " player " + model.Unum + " team: " + model.team);
 				if(distances[model.friendlyPlayerClosestToBall(distances)] < model.ball.distance) {
 					return getOpen();
 				}
