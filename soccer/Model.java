@@ -46,35 +46,13 @@ public class Model {
 		goalInVision = false;
 		flags = new LinkedList<Flag>();
 		players = new LinkedList<Player>();
-
 	}
 
-	public void addFlag(Flag f) {
-		// TODO Auto-generated method stub
-		flags.add(f);
-		if (f.name == 'g') {
-			if ((field_side == 'r' && f.left) || (field_side == 'l' && f.right)) {
-				goalInVision = true;
-				goal = f;
-			}
-		}
-	}
-
-	public void addPlayer(Player player) {
-		// TODO Auto-generated method stub
-		players.add(player);
-	}
-
-	public void addBall(Ball ball) {
-		// TODO Auto-generated method stub
-		this.ball = ball;
-		ballInVision = true;
-	}
 
 	public int closestPlayer() {
 		int k = 0;
 		for (int i = 0; i < players.size(); i++) {
-			if (players.get(k).distance > players.get(i).distance) {
+			if (players.get(k).Distance > players.get(i).Distance) {
 				k = i;
 			}
 		}
@@ -91,7 +69,7 @@ public class Model {
 		}
 		for (int i = k + 1; i < players.size(); i++) {
 			if (players.get(i).team != null && players.get(i).team.equals(team)) {
-				if (players.get(k).distance > players.get(i).distance) {
+				if (players.get(k).Distance > players.get(i).Distance) {
 					k = i;
 				}
 			}
@@ -106,8 +84,8 @@ public class Model {
 			return null;
 		double[] ans = new double[players.size()];
 		for (int i = 0; i < players.size(); i++) {
-			ans[i] = distance(ball.degree, ball.distance,
-					players.get(i).degree, players.get(i).distance);
+			ans[i] = distance(ball.Direction, ball.Distance,
+					players.get(i).Direction, players.get(i).Distance);
 		}
 		return ans;
 	}
@@ -180,4 +158,115 @@ public class Model {
 						* distanceA * distanceB
 						* Math.cos(Math.abs(degreeA - degreeB)));
 	}
+
+
+    void addObject(String description, String values) {
+        String[] desc = description.split("\\s\\\"|\\s|\\\"\\s|\\\"");
+        switch(desc[0]){
+            case("p"):
+            case("P"):
+                addPlayer(desc, values.split("\\s"));
+                break;
+            case("b"):
+            case("B"):
+                addBall(desc, values.split("\\s"));
+                break;
+            default:
+                addFlag(desc, values.split("\\s"));
+        }
+    }
+
+    private void addPlayer(String[] desc, String[] values) {
+        Player p = new Player();
+        if(desc.length>1){
+            p.team = desc[1];
+            if(desc.length>2){
+                p.Unum = Integer.parseInt(desc[2]);
+                if(desc.length>3){
+                    p.goalie = true;
+                }
+            }
+        }
+        int length = values.length;
+        try{
+        
+        if(values.length == 1){
+            p.Direction = Integer.parseInt(values[0]);
+        }else if(values.length>1){
+            p.Distance = Double.parseDouble(values[0]);
+            p.Direction = Integer.parseInt(values[1]);
+            if(values.length>2){
+                if(values[values.length-1].matches("t|k")){
+                    if(values[values.length-1].equals("k")){
+                        p.kick = true;
+                    }else{
+                        p.tackle = true;
+                    }
+                    length--;
+                }
+                if(length==3){               
+                    p.PointintDir = Integer.parseInt(values[2]);
+                }else if(length>3){
+                    p.DistChange = Double.parseDouble(values[2]);
+                    p.DirChange = Double.parseDouble(values[3]);
+                    if(length==5){
+                        p.PointintDir = Integer.parseInt(values[4]);
+                    }else{
+                        p.BodyFacingDir = Integer.parseInt(values[4]);
+                        p.HeadFacingDir = Integer.parseInt(values[5]);
+                        if(length==7){
+                            p.PointintDir = Integer.parseInt(values[6]);
+                        }
+                    }
+                }
+            }
+        }
+        }catch(NumberFormatException e){
+            for(String s: values){
+                System.err.println(s);
+            }
+            System.err.format("length %d  values.length %d matches t|k %b %n", length, values.length, values[values.length-1].matches("t|k"));
+            e.printStackTrace();
+        }
+        players.add(p);
+    }
+
+    private void addBall(String[] desc, String[] values) {
+        this.ball = new Ball();
+        ballInVision = true;
+        if(values.length == 1){
+            this.ball.Direction = Integer.parseInt(values[0]);
+        }else if(values.length>1){
+            this.ball.Distance = Double.parseDouble(values[0]);
+            this.ball.Direction = Integer.parseInt(values[1]);
+            if(values.length>2){
+                this.ball.DistChange = Double.parseDouble(values[2]);
+                this.ball.DirChange = Double.parseDouble(values[3]);
+            }
+        }
+    }
+
+    private void addFlag(String[] desc, String[] values) {
+        Flag f = new Flag(desc[0].charAt(0));
+        for(int i = 1; i < desc.length; i++){
+            f.set(desc[i]);
+        }
+        if(values.length == 1){
+            f.Direction = Integer.parseInt(values[0]);
+        }else if(values.length>1){
+            f.Distance = Double.parseDouble(values[0]);
+            f.Direction = Integer.parseInt(values[1]);
+            if(values.length>2){
+                f.DistChange = Double.parseDouble(values[2]);
+                f.DirChange = Double.parseDouble(values[3]);
+            }
+        }
+        if (f.name == 'g') {
+            if ((field_side == 'r' && f.left) || (field_side == 'l' && f.right)) {
+                goalInVision = true;
+                goal = f;
+            }
+        }
+        flags.add(f);
+    }
 }

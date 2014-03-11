@@ -1,6 +1,6 @@
 package soccer;
 
-public class Flag {
+public class Flag extends FieldObject{
 	char name;
 	boolean left;
 	boolean right;
@@ -10,10 +10,6 @@ public class Flag {
 	boolean penalty;
 	boolean center;
 	int fromCenter;
-	int distance;
-	int degree;
-	int distanceChange;
-	int degreeChange;
 	
 	public Flag(char name){
 		this.name = name;

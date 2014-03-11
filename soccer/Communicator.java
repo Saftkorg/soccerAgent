@@ -10,7 +10,6 @@ import java.util.Arrays;
 
 public class Communicator {
 
-	private int index;
 	private String msg;
 	
 	private InetAddress host;
@@ -80,144 +79,35 @@ public class Communicator {
 
 		// String msg = "(init l 1 before_kick_off)";
 		if(msg.startsWith("(see")){
+                    //System.err.println(model.team + " " +model.Unum+ ": " +msg);
 			seeMsg();
 		}else if(msg.startsWith("(player")){
-                    System.err.println(msg);
+                    //System.err.println(msg);
 			
 		}else if(msg.startsWith("(init")){
 			initMsg();
 		}else if(msg.startsWith("(sense_body")){
                     
                 }else{
-                    System.err.println(msg);
+                    //System.err.println(msg);
                 }
 		
 	}
 
 	private void seeMsg() {
-		
-		index = 5;
-		
-		model.time(getInt());
-		
-		
-		while(index < msg.length() && msg.charAt(index)=='('){
-			index++;
-			String tmp = getString();
-			switch(tmp.charAt(0)){
-				case('p'):
-					addPlayer(tmp);
-					break;
-				case('b'):
-					addBall();
-					break;
-				default:
-                                    addFlag(tmp);
-                                    break;
-			}
-		}
-		
+		msg = msg.trim();
+		model.time(Integer.parseInt(msg.substring(5, msg.indexOf(' ', 5))));
+                msg = msg.substring(msg.indexOf('(', 3)+2,msg.length()-2);
+                String[] msgA = msg.split("\\)\\s\\(\\(");
+                String[] msgTmp;
+		for(String s: msgA){
+                    msgTmp = s.split("\\)\\s");
+                    if(msgTmp.length > 1){
+                        model.addObject(msgTmp[0],msgTmp[1]);
+                    }
+                }
 	}
  
-	private void addBall() {
-		// TODO Auto-generated method stub
-		Ball ball = new Ball();
-		ball.distance = getDouble();
-		ball.degree = getInt();
-		if(msg.charAt(index-2)!=')'){
-			ball.distanceChange = getInt();
-		}
-		if(msg.charAt(index-2)!=')'){
-			ball.degreeChange = getInt();
-		}
-		model.addBall(ball);
-		
-	}
-
-	private void addPlayer(String playerProperties) {
-		// TODO Auto-generated method stub
-		String[] props = playerProperties.split("\\s\"|\\s|\"\\s");
-		Player player = new Player();
-		if(props.length>1){
-		player.team = props[1];
-		}
-		if(props.length>2){
-			player.Unum = Integer.parseInt(props[2]);
-		}
-		
-		player.distance = getInt();
-		player.degree = getInt();
-		if(msg.charAt(index-2)!=')'){
-                    if(msg.charAt(index)=='k'){
-                        index+=3;
-                    }else{
-                        player.distanceChange = getInt();
-                    }
-		}
-		if(msg.charAt(index-2)!=')'){
-			player.degreeChange = getInt();
-		}
-		model.addPlayer(player);
-		
-	}
-
-	private void addFlag(String flagName) {
-		String[] props = flagName.split("\\s+");
-		Flag f = new Flag(props[0].charAt(0));
-		
-		for(int i = 1; i < props.length; i++){
-			f.set(props[i]);
-		}
-		f.distance = getInt();
-		f.degree = getInt();
-		if(msg.charAt(index-2)!=')'){
-			f.distanceChange = getInt();
-		}
-		if(msg.charAt(index-2)!=')'){
-			f.degreeChange = getInt();
-		}
-		model.addFlag(f);
-	}
-
-	private String getString(){
-		index++;
-		String ret = "";
-		while(msg.charAt(index)!=')'){
-			ret+= msg.charAt(index);
-			index++;
-		}
-		index+=2;
-		return ret;
-	}
-	private int getInt(){
-		String inte = "";
-		while(msg.charAt(index)!=' ' && msg.charAt(index)!=')'){
-			inte += msg.charAt(index);
-			index++;
-		}
-		if(msg.charAt(index)==')'){
-			index++;
-		}
-		index++;
-		if(inte.contains(".")){
-			return Math.round(Float.valueOf(inte));
-		}
-		return Integer.parseInt(inte);
-	}
-	
-	private double getDouble(){
-		String dobe = "";
-		while(msg.charAt(index)!=' '&& msg.charAt(index)!=')'){
-			dobe += msg.charAt(index);
-			index++;
-		}
-                if(msg.charAt(index)==')'){
-			index++;
-		}
-		index++;
-		return Double.parseDouble(dobe);
-	}
-
 	private void initMsg() {
 		String[] msgA = msg.split("\\s+");
 		model.setFieldSide(msgA[1].charAt(0));
@@ -226,6 +116,7 @@ public class Communicator {
 
 
 	void quit() {
+                send("(bye)");
 		socket.close();
 	}
 }

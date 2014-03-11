@@ -79,7 +79,6 @@ public class SoccerAgent extends Thread {
 
 			}
 		}
-		com.send("(bye)");
 		com.quit();
 	}
 
@@ -99,7 +98,7 @@ public class SoccerAgent extends Thread {
 	 *            index of player to kick the ball towards.
 	 */
 	private String passBall(int k) {
-		return kick(50.0, model.players.get(k).degree); // TODO - obvious
+		return kick(50.0, model.players.get(k).Direction); // TODO - obvious
 	}
 
 	/**
@@ -109,10 +108,10 @@ public class SoccerAgent extends Thread {
 	private String getOpen() {
 		if(!model.ballInVision)
 			return scanField();
-		if(model.ball.degree > 0) {
-			return dash(50.0, model.ball.degree - 180);
+		if(model.ball.Direction > 0) {
+			return dash(50.0, model.ball.Direction - 180);
 		}
-		return dash(50.0, 180 + model.ball.degree); // TODO - derp
+		return dash(50.0, 180 + model.ball.Direction); // TODO - derp
 	}
 
 	/**
@@ -127,9 +126,9 @@ public class SoccerAgent extends Thread {
 			System.err.println("Cannot see ball. Don't call goToBall.");
 			return scanField();
 		}
-		// System.err.format("Ball at %d degrees %n", model.ball.degree);
-		if (model.ball.degree > 20 || model.ball.degree < -20) {
-			return turn(model.ball.degree);
+		 //System.err.format("%s ball at %d degrees %n",model.team, model.ball.degree);
+		if (model.ball.Direction > 20 || model.ball.Direction < -20) {
+			return turn(model.ball.Direction);
 		} else {
 			return dash(75.0);// "(dash 50.0 15.0)";
 		}
@@ -146,7 +145,7 @@ public class SoccerAgent extends Thread {
 			System.err.println("Cannot see goal. Don't try to hit it!");
 			return scanField();
 		}
-		return kick(100.0, model.goal.degree); // TODO
+		return kick(100.0, model.goal.Direction); // TODO
 	}
 
 	private String scanField() {
@@ -161,10 +160,10 @@ public class SoccerAgent extends Thread {
 			if (hasBall()) {
 				double goalKickValue = -1.0;
 				if(model.goalInVision)
-					goalKickValue = wGoalKick*model.goal.distance;
+					goalKickValue = wGoalKick*model.goal.Distance;
 				double passValue = -1.0;
 				if(!(k == -1))
-					passValue = wPass*model.players.get(k).distance;
+					passValue = wPass*model.players.get(k).Distance;
 				
 				if(passValue == -1.0 && goalKickValue == -1.0) 
 					return holdBall();
@@ -181,8 +180,7 @@ public class SoccerAgent extends Thread {
 			}
 			if(k != -1) {
 				double[] distances = model.playersBallDistance();
-//				System.err.println("Closest friend distance: " + distances[model.friendlyPlayerClosestToBall(distances)] + " My distance: " + model.ball.distance + " player " + model.Unum + " team: " + model.team);
-				if(distances[model.friendlyPlayerClosestToBall(distances)] < model.ball.distance) {
+				if(distances[model.friendlyPlayerClosestToBall(distances)] < model.ball.Distance) {
 					return getOpen();
 				}
 			}
@@ -246,11 +244,11 @@ public class SoccerAgent extends Thread {
 
 	private String faceBall() {
 		if(model.ballInVision)
-			return turn(model.ball.degree);
+			return turn(model.ball.Direction);
 		return scanField();
 	}
 	
 	public boolean hasBall() {
-		return model.ball.distance <= 0.7;
+		return model.ball.Distance <= 0.7;
 	}
 }
