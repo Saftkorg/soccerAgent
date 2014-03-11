@@ -46,8 +46,8 @@ public class SoccerAgent extends Thread {
 		String msg = "(init " + model.getTeam() + " (version " + VERSION + "))";
 		// int count = 0;
 		com.send(msg);
-		int x = -20;
-		int y = -10;
+		int x = -(10 + 5*model.Unum);
+		int y = -(0 + 3*model.Unum);
 
 		/*
 		 * if(model.field_side == 'r'){ x = 20; y = 10; }
@@ -76,7 +76,8 @@ public class SoccerAgent extends Thread {
 	 * position that is as far away from the opponents as possible.
 	 */
 	private String holdBall() {
-		return turn(45.0); // TODO
+		System.err.println("Holding ball");
+		return kick(15.0, 45.0); // TODO
 	}
 
 	/**
@@ -86,7 +87,7 @@ public class SoccerAgent extends Thread {
 	 *            index of player to kick the ball towards.
 	 */
 	private String passBall(int k) {
-		return kick(75.0, model.players.get(k).degree); // TODO - obvious
+		return kick(50.0, model.players.get(k).degree); // TODO - obvious
 	}
 
 	/**
@@ -140,15 +141,35 @@ public class SoccerAgent extends Thread {
 		return turn(45.0);
 	}
 
+	private double wGoalKick = 1.0 - r.nextDouble();
+	private double wPass = 1.0 - r.nextDouble();
 	private String decideAction() {
 		if (model.ballInVision) {
+			int k = model.closestFriendlyPlayer();
 			if (hasBall()) {
-				if (model.goalInVision) {
+				double goalKickValue = -1.0;
+				if(model.goalInVision)
+					goalKickValue = wGoalKick*model.goal.distance;
+				double passValue = -1.0;
+				if(!(k == -1))
+					passValue = wPass*model.players.get(k).distance;
+				
+				if(passValue == -1.0 && goalKickValue == -1.0) 
+					return holdBall();
+				if(passValue > goalKickValue) 
+					return passBall(k);
+				return goalKick();
+				/*if (model.goalInVision) {
 					return goalKick();
 				}
 				int k = model.closestFriendlyPlayer();
 				if(k != -1) {
 					passBall(k);
+				}*/
+			}
+			if(k != -1) {
+				if(Math.abs(model.ball.distance - model.players.get(k).distance) < model.ball.distance) {
+					return getOpen();
 				}
 			}
 			return goToBall();
@@ -178,6 +199,7 @@ public class SoccerAgent extends Thread {
 	 *            degrees turning angle. 90 is 90 degrees right.
 	 */
 	private String turn(double moment) {
+		System.err.println("Turn " + model.Unum + " " + model.team);
 		avoidFKF = false;
 		return ("(turn " + Double.toString(moment) + ")");
 	}
@@ -189,10 +211,12 @@ public class SoccerAgent extends Thread {
 	 *            Double check this: percentage power. 100 is max.
 	 */
 	private String dash(double power) {
+		System.err.println("Dash " + model.Unum + " " + model.team);
 		return ("(dash " + Double.toString(power) + ")");
 	}
 
 	private String dash(double power, double direction) {
+		System.err.println("Dash " + model.Unum + " " + model.team);
 		return ("(dash " + Double.toString(power) + " "
 				+ Double.toString(direction) + ")");
 	}
@@ -200,6 +224,7 @@ public class SoccerAgent extends Thread {
 	private String kick(double power, double direction) {
 		if(avoidFKF) 
 			return faceBall();
+		System.err.println("Kick " + model.Unum + " " + model.team);
 		avoidFKF = true;
 		return ("(kick " + Double.toString(power) + " "
 				+ Double.toString(direction) + ")");

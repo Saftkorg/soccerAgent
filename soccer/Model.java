@@ -5,9 +5,9 @@ import java.util.List;
 
 public class Model {
 
-	private String team;
+	String team;
 	char field_side;
-	private int Unum;
+	int Unum;
 	int time;
 
 	List<Flag> flags;
@@ -84,13 +84,13 @@ public class Model {
 	public int closestFriendlyPlayer() {
 		int k = -1;
 		for (int i = 0; i < players.size(); i++) {
-			if (players.get(i).team.equals(team)) {
+			if (players.get(i).team != null && players.get(i).team.equals(team)) {
 				k = i;
 				break;
 			}
 		}
 		for (int i = k + 1; i < players.size(); i++) {
-			if (players.get(i).team.equals(team)) {
+			if (players.get(i).team != null && players.get(i).team.equals(team)) {
 				if (players.get(k).distance > players.get(i).distance) {
 					k = i;
 				}
