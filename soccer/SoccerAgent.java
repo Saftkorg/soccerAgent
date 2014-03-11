@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Random;
+import soccer.StartTeam.Formation;
 
 /**
  * This is the main class of the RoboCup Soccer Agent
@@ -27,6 +28,9 @@ public class SoccerAgent extends Thread {
 	
 	Random r = new Random();
 
+        int x;
+        int y;
+        boolean goalie;
 	/**
 	 * 
 	 * @param args
@@ -34,20 +38,28 @@ public class SoccerAgent extends Thread {
 	 * @throws UnknownHostException
 	 * @throws NumberFormatException
 	 */
-	public SoccerAgent(String[] args) throws NumberFormatException,
+	public SoccerAgent(String[] args, Formation f) throws NumberFormatException,
 			UnknownHostException, SocketException {
 
+            x = f.x;
+            y = f.y;
+            goalie = f.goalie;
 		model = new Model(args[0]);
 		com = new Communicator(args[1], Integer.parseInt(args[2]), model);
 
 	}
 
 	public void run() {
-		String msg = "(init " + model.getTeam() + " (version " + VERSION + "))";
+            String msg;
+            if(!goalie){
+                msg = "(init " + model.getTeam() + " (version " + VERSION + "))";
+            }else{
+                msg = "(init " + model.getTeam() + " (version " + VERSION + ") (goalie))";
+            }
+		
 		// int count = 0;
 		com.send(msg);
-		int x = -(10 + 5*model.Unum);
-		int y = -(0 + 3*model.Unum);
+		
 
 		/*
 		 * if(model.field_side == 'r'){ x = 20; y = 10; }
