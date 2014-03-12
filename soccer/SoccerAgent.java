@@ -1,9 +1,5 @@
 package soccer;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Random;
@@ -87,7 +83,7 @@ public class SoccerAgent extends Thread {
 	 * position that is as far away from the opponents as possible.
 	 */
 	private String holdBall() {
-		System.err.println("Holding ball");
+		//System.err.println("Holding ball");
 		return kick(15.0, 45.0); // TODO
 	}
 
@@ -123,7 +119,7 @@ public class SoccerAgent extends Thread {
 	 */
 	private String goToBall() { // TODO - Make this method not retarded.
 		if (!model.ballInVision) {
-			System.err.println("Cannot see ball. Don't call goToBall.");
+			//System.err.println("Cannot see ball. Don't call goToBall.");
 			return scanField();
 		}
 		 //System.err.format("%s ball at %d degrees %n",model.team, model.ball.degree);
@@ -142,7 +138,7 @@ public class SoccerAgent extends Thread {
 	 */
 	public String goalKick() {
 		if (!model.goalInVision) {
-			System.err.println("Cannot see goal. Don't try to hit it!");
+			//System.err.println("Cannot see goal. Don't try to hit it!");
 			return scanField();
 		}
 		return kick(100.0, model.goal.direction); // TODO
@@ -236,7 +232,7 @@ public class SoccerAgent extends Thread {
 	private String kick(double power, double direction) {
 		if(avoidFKF) 
 			return faceBall();
-		System.err.println("Kick " + model.Unum + " " + model.team);
+		//System.err.println("Kick " + model.Unum + " " + model.team);
 		avoidFKF = true;
 		return ("(kick " + Double.toString(power) + " "
 				+ Double.toString(direction) + ")");

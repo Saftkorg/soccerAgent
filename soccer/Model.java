@@ -7,11 +7,12 @@ public class Model {
 
 	String team;
 	char field_side;
-	int Unum;
+	int unum;
 	int time;
 
 	List<Flag> flags;
 	List<Player> players;
+        Body body;
 	Ball ball;
 	Flag goal;
 	boolean goalInVision;
@@ -22,6 +23,7 @@ public class Model {
 		time = -1;
 		ballInVision = false;
 		goalInVision = false;
+                body = new Body();
 		flags = new LinkedList<Flag>();
 		players = new LinkedList<Player>();
 	}
@@ -31,8 +33,8 @@ public class Model {
 		this.field_side = field_side;
 	}
 
-	void setUnum(int Unum) {
-		this.Unum = Unum;
+	void setUnum(int unum) {
+		this.unum = unum;
 	}
 
 	String getTeam() {
@@ -153,8 +155,7 @@ public class Model {
 	 */
 	public double distance(double degreeA, double distanceA, double degreeB,
 			double distanceB) {
-		return Math
-				.sqrt(Math.pow(distanceA, 2) + Math.pow(distanceB, 2) - 2
+		return Math.sqrt(Math.pow(distanceA, 2) + Math.pow(distanceB, 2) - 2
 						* distanceA * distanceB
 						* Math.cos(Math.abs(degreeA - degreeB)));
 	}

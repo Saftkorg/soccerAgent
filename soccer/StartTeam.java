@@ -44,6 +44,9 @@ public class StartTeam {
 //		Runtime.getRuntime().exec("C:/Users/Viktor/rcssserver/rcssserver-15.0.0-win/rcssserver.exe", null, new File("C:/Users/Viktor/rcssserver/rcssserver-15.0.0-win"));
 //		Runtime.getRuntime().exec("C:/Users/Viktor/rcssserver/rcssmonitor-14.1.0-win/rcssmonitor.exe", null, new File("C:/Users/Viktor/rcssserver/rcssmonitor-14.1.0-win"));
 
+            
+            
+            
 		String[] first = { "MyTeam", "localhost", "6000"};
 		String[] second = { "MyTheme", "localhost", "6000"  };
 		//String[] first = { "MyTeam", "192.168.1.4", "6000" };
@@ -52,18 +55,17 @@ public class StartTeam {
                     first[0] = args[0];
                 }
                 try {
-                    
+                    /*
                         for(Formation f : Formation.values()){
                             (new SoccerAgent(first,  f)).start();
                             (new SoccerAgent(second, f)).start();
                         }
-                       
-			/*
+                    */
                     (new SoccerAgent(first,  Formation.FC)).start();
-                    (new SoccerAgent(second, Formation.FC)).start();
-                    (new SoccerAgent(first,  Formation.HBC)).start();
-                    (new SoccerAgent(second, Formation.HBC)).start();
-			*/
+                    //(new SoccerAgent(second, Formation.FC)).start();
+                    //(new SoccerAgent(first,  Formation.HBC)).start();
+                    //(new SoccerAgent(second, Formation.HBC)).start();
+			
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
