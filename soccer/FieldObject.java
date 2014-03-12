@@ -12,8 +12,8 @@ package soccer;
  */
 
 public class FieldObject {
-    Double Distance;
-    int Direction;
-    Double DistChange;
-    Double DirChange;
+    Double distance;
+    int direction;
+    Double distChange;
+    Double dirChange;
 }

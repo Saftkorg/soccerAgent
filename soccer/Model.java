@@ -52,7 +52,7 @@ public class Model {
 	public int closestPlayer() {
 		int k = 0;
 		for (int i = 0; i < players.size(); i++) {
-			if (players.get(k).Distance > players.get(i).Distance) {
+			if (players.get(k).distance > players.get(i).distance) {
 				k = i;
 			}
 		}
@@ -69,7 +69,7 @@ public class Model {
 		}
 		for (int i = k + 1; i < players.size(); i++) {
 			if (players.get(i).team != null && players.get(i).team.equals(team)) {
-				if (players.get(k).Distance > players.get(i).Distance) {
+				if (players.get(k).distance > players.get(i).distance) {
 					k = i;
 				}
 			}
@@ -84,8 +84,8 @@ public class Model {
 			return null;
 		double[] ans = new double[players.size()];
 		for (int i = 0; i < players.size(); i++) {
-			ans[i] = distance(ball.Direction, ball.Distance,
-					players.get(i).Direction, players.get(i).Distance);
+			ans[i] = distance(ball.direction, ball.distance,
+					players.get(i).direction, players.get(i).distance);
 		}
 		return ans;
 	}
@@ -181,7 +181,7 @@ public class Model {
         if(desc.length>1){
             p.team = desc[1];
             if(desc.length>2){
-                p.Unum = Integer.parseInt(desc[2]);
+                p.unum = Integer.parseInt(desc[2]);
                 if(desc.length>3){
                     p.goalie = true;
                 }
@@ -191,10 +191,10 @@ public class Model {
         try{
         
         if(values.length == 1){
-            p.Direction = Integer.parseInt(values[0]);
+            p.direction = Integer.parseInt(values[0]);
         }else if(values.length>1){
-            p.Distance = Double.parseDouble(values[0]);
-            p.Direction = Integer.parseInt(values[1]);
+            p.distance = Double.parseDouble(values[0]);
+            p.direction = Integer.parseInt(values[1]);
             if(values.length>2){
                 if(values[values.length-1].matches("t|k")){
                     if(values[values.length-1].equals("k")){
@@ -205,17 +205,17 @@ public class Model {
                     length--;
                 }
                 if(length==3){               
-                    p.PointintDir = Integer.parseInt(values[2]);
+                    p.pointintDir = Integer.parseInt(values[2]);
                 }else if(length>3){
-                    p.DistChange = Double.parseDouble(values[2]);
-                    p.DirChange = Double.parseDouble(values[3]);
+                    p.distChange = Double.parseDouble(values[2]);
+                    p.dirChange = Double.parseDouble(values[3]);
                     if(length==5){
-                        p.PointintDir = Integer.parseInt(values[4]);
+                        p.pointintDir = Integer.parseInt(values[4]);
                     }else{
-                        p.BodyFacingDir = Integer.parseInt(values[4]);
-                        p.HeadFacingDir = Integer.parseInt(values[5]);
+                        p.bodyFacingDir = Integer.parseInt(values[4]);
+                        p.headFacingDir = Integer.parseInt(values[5]);
                         if(length==7){
-                            p.PointintDir = Integer.parseInt(values[6]);
+                            p.pointintDir = Integer.parseInt(values[6]);
                         }
                     }
                 }
@@ -235,13 +235,13 @@ public class Model {
         this.ball = new Ball();
         ballInVision = true;
         if(values.length == 1){
-            this.ball.Direction = Integer.parseInt(values[0]);
+            this.ball.direction = Integer.parseInt(values[0]);
         }else if(values.length>1){
-            this.ball.Distance = Double.parseDouble(values[0]);
-            this.ball.Direction = Integer.parseInt(values[1]);
+            this.ball.distance = Double.parseDouble(values[0]);
+            this.ball.direction = Integer.parseInt(values[1]);
             if(values.length>2){
-                this.ball.DistChange = Double.parseDouble(values[2]);
-                this.ball.DirChange = Double.parseDouble(values[3]);
+                this.ball.distChange = Double.parseDouble(values[2]);
+                this.ball.dirChange = Double.parseDouble(values[3]);
             }
         }
     }
@@ -252,13 +252,13 @@ public class Model {
             f.set(desc[i]);
         }
         if(values.length == 1){
-            f.Direction = Integer.parseInt(values[0]);
+            f.direction = Integer.parseInt(values[0]);
         }else if(values.length>1){
-            f.Distance = Double.parseDouble(values[0]);
-            f.Direction = Integer.parseInt(values[1]);
+            f.distance = Double.parseDouble(values[0]);
+            f.direction = Integer.parseInt(values[1]);
             if(values.length>2){
-                f.DistChange = Double.parseDouble(values[2]);
-                f.DirChange = Double.parseDouble(values[3]);
+                f.distChange = Double.parseDouble(values[2]);
+                f.dirChange = Double.parseDouble(values[3]);
             }
         }
         if (f.name == 'g') {
