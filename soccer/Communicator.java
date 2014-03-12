@@ -96,6 +96,10 @@ public class Communicator {
 
 	private void seeMsg() {
 		msg = msg.trim();
+                if(msg.length()<11){
+                    model.time(Integer.parseInt(msg.substring(5, msg.indexOf(')', 5))));
+                    return;
+                }
 		model.time(Integer.parseInt(msg.substring(5, msg.indexOf(' ', 5))));
                 msg = msg.substring(msg.indexOf('(', 3)+2,msg.length()-2);
                 String[] msgA = msg.split("\\)\\s\\(\\(");

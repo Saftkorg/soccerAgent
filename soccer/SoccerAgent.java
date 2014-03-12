@@ -211,7 +211,7 @@ public class SoccerAgent extends Thread {
 	 *            degrees turning angle. 90 is 90 degrees right.
 	 */
 	private String turn(double moment) {
-		System.err.println("Turn " + model.Unum + " " + model.team);
+		//System.err.println("Turn " + model.Unum + " " + model.team);
 		avoidFKF = false;
 		return ("(turn " + Double.toString(moment) + ")");
 	}
@@ -223,12 +223,12 @@ public class SoccerAgent extends Thread {
 	 *            Double check this: percentage power. 100 is max.
 	 */
 	private String dash(double power) {
-		System.err.println("Dash " + model.Unum + " " + model.team);
+		//System.err.println("Dash " + model.Unum + " " + model.team);
 		return ("(dash " + Double.toString(power) + ")");
 	}
 
 	private String dash(double power, double direction) {
-		System.err.println("Dash " + model.Unum + " " + model.team);
+		//System.err.println("Dash " + model.Unum + " " + model.team);
 		return ("(dash " + Double.toString(power) + " "
 				+ Double.toString(direction) + ")");
 	}
