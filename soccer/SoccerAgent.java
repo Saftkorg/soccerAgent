@@ -123,6 +123,7 @@ public class SoccerAgent extends Thread {
 			return scanField();
 		}
 		 //System.err.format("%s ball at %d degrees %n",model.team, model.ball.degree);
+                System.err.format("ball at %f distanceChange, our speed: %f %n", model.ball.distChange, model.body.amountOfSpeed);
 		if (model.ball.direction > 20 || model.ball.direction < -20) {
 			return turn(model.ball.direction);
 		} else {
