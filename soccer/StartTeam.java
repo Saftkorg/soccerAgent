@@ -55,13 +55,13 @@ public class StartTeam {
                     first[0] = args[0];
                 }
                 try {
-                    /*
+                    
                         for(Formation f : Formation.values()){
                             (new SoccerAgent(first,  f)).start();
                             (new SoccerAgent(second, f)).start();
                         }
-                    */
-                    (new SoccerAgent(first,  Formation.FC)).start();
+                    
+//                    (new SoccerAgent(first,  Formation.FC)).start();
                     //(new SoccerAgent(second, Formation.FC)).start();
                     //(new SoccerAgent(first,  Formation.HBC)).start();
                     //(new SoccerAgent(second, Formation.HBC)).start();

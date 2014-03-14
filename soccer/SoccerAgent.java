@@ -168,14 +168,15 @@ public class SoccerAgent extends Thread {
 	}
 	
 	private String interceptBall() {
-		if(model.ball.distChange == null || model.ball.distChange == 0.0) {
+		if(model.ball.distChange == null || (Math.abs(model.ball.distChange + model.body.amountOfSpeed) < 0.08 || Math.abs(model.ball.dirChange) < 0.5)) {
 			return dash(dashPower, model.ball.direction);
 		}
-		System.err.println("Ball distChange: " + model.ball.distChange + " Ball distance: " + model.ball.distance + " Ball dirChange: " + model.ball.dirChange);
+//		System.err.println("Ball distChange: " + model.ball.distChange + " Ball distance: " + model.ball.distance + " Ball dirChange: " + model.ball.dirChange);
 		double[] ballSpeeds = new double[20];
 		ballSpeeds[0] = model.distance(0.0, model.ball.distance, model.ball.dirChange, model.ball.distance - model.ball.distChange);
 		double[] ballTraveledDistance = new double[20];
-		double dAngle = 180 - Math.toDegrees(Math.asin((model.ball.distance - model.ball.distChange)*Math.sin(ballSpeeds[0])/ballSpeeds[0]));
+		double dAngle = 180 - Math.toDegrees(Math.asin((model.ball.distance - model.ball.distChange)*Math.sin(model.ball.dirChange)/ballSpeeds[0]));
+//		System.err.println("arcsin: " + (model.ball.distance - model.ball.distChange)*Math.sin(model.ball.dirChange)/ballSpeeds[0]);
 		double[] ballDistancePredictions = new double[20];
 		ballDistancePredictions[0] = model.ball.distance;
 		for(int i = 1; i < ballSpeeds.length; i++) {
@@ -185,12 +186,13 @@ public class SoccerAgent extends Thread {
 		}
 		int k = 0;
 		for(int i = 1; i < ballDistancePredictions.length; i++) {
-			if(Math.abs(ballDistancePredictions[i] - i) < Math.abs(ballDistancePredictions[k] - k)) {
+			if(Math.abs(ballDistancePredictions[i] - i) < Math.abs(ballDistancePredictions[k] - k)) {	//TODO - May be error here
 				k = i;
 			}
 		}
 		double oAngle = Math.toDegrees(Math.asin((ballTraveledDistance[k])*Math.sin(dAngle)/ballDistancePredictions[k]));
-		System.err.println("dAngle: " + dAngle + " ballTD: " + ballTraveledDistance[k] + " oAngle: " + oAngle + " ballDir: " + model.ball.direction);
+//		System.err.println("dAngle: " + dAngle + " ballTD: " + ballTraveledDistance[k] + " oAngle: " + oAngle + " ballDir: " + model.ball.direction + " ballDistPre: " + ballDistancePredictions[k]);
+	//	if ballDistancePrediction == 0 run towards ball
 		return dash(100.0 ,oAngle + model.ball.direction);
 	}
 
@@ -272,6 +274,7 @@ public class SoccerAgent extends Thread {
 	}
 
 	private String dash(double power, double direction) {
+		System.err.println("Dash " + power + " " + direction);
 		return ("(dash " + Double.toString(power) + " "
 				+ Double.toString(direction) + ")");
 	}
