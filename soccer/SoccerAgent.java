@@ -7,12 +7,11 @@ import soccer.StartTeam.Formation;
 
 /**
  * This is the main class of the RoboCup Soccer Agent
- * 
+ *
  * @author Gavelli, Viktor
  * @author Gomez, Alexander
- * 
+ *
  */
-
 public class SoccerAgent extends Thread {
 
 	Model model;

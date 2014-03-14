@@ -2,6 +2,7 @@ package soccer;
 
 public class Flag extends FieldObject{
 	char name;
+        byte props;
 	boolean left;
 	boolean right;
 	boolean top;
@@ -13,6 +14,9 @@ public class Flag extends FieldObject{
 	
 	public Flag(char name){
 		this.name = name;
+                if(name == 'g'){
+                    goal = true;
+                }
 	}
 	
 	public void set(String property) {
