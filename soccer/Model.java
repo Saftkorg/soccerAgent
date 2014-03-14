@@ -248,6 +248,9 @@ public class Model {
     }
 
     private void addFlag(String[] desc, String[] values) {
+        if(values.length == 3 && values[2].length()>1){
+            return;
+        }
         Flag f = new Flag(desc[0].charAt(0));
         for(int i = 1; i < desc.length; i++){
             f.set(desc[i]);
