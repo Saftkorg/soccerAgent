@@ -49,32 +49,33 @@ public class StartTeam {
         String[] first = {"MyTeam", "localhost", "6000"};
         String[] second = {"MyTheme", "localhost", "6000"};
 		//String[] first = { "MyTeam", "192.168.1.4", "6000" };
-        //String[] second = { "MyTheme", "192.168.1.4", "6000"  };
-        if (args.length > 0) {
-            first[0] = args[0];
-        }
-        try {
-            /*
-             for(Formation f : Formation.values()){
-             (new SoccerAgent(first,  f)).start();
-             (new SoccerAgent(second, f)).start();
-             }
-             */
-                    (new SoccerAgent(first,  Formation.FC)).start();
-//                    (new SoccerAgent(second, Formation.GOALIE)).start();
-//                    (new SoccerAgent(first,  Formation.HBC)).start();
-//                    (new SoccerAgent(second, Formation.HBC)).start();
+		//String[] second = { "MyTheme", "192.168.1.4", "6000"  };
+		if(args.length > 0){
+                    first[0] = args[0];
+                }
+                try {
+                    
+                        for(Formation f : Formation.values()){
+                            (new SoccerAgent(first,  f)).start();
+                            (new SoccerAgent(second, f)).start();
+                        }
+                    
+//                    (new SoccerAgent(first,  Formation.FC)).start();
+                    //(new SoccerAgent(second, Formation.FC)).start();
+                    //(new SoccerAgent(first,  Formation.HBC)).start();
+                    //(new SoccerAgent(second, Formation.HBC)).start();
+			
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-        } catch (NumberFormatException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SocketException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
 
     }
 
