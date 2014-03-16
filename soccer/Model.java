@@ -12,8 +12,8 @@ public class Model {
 
 	List<Flag> flags;
 	List<Player> players;
-        Body body;
 	Ball ball;
+	Body body;
 	Flag goal;
 	boolean goalInVision;
 	boolean ballInVision;
