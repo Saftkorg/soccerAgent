@@ -1,5 +1,6 @@
 package soccer;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,11 +11,11 @@ public class Model {
 	int unum;
 	int time;
 
-	List<Flag> flags;
+	HashMap<String, FieldObject> flags;
 	List<Player> players;
         Body body;
-	Ball ball;
-	Flag goal;
+	FieldObject ball;
+	FieldObject goal;
 	boolean goalInVision;
 	boolean ballInVision;
 
@@ -24,7 +25,7 @@ public class Model {
 		ballInVision = false;
 		goalInVision = false;
                 body = new Body();
-		flags = new LinkedList<Flag>();
+		flags = new HashMap<String, FieldObject>();
 		players = new LinkedList<Player>();
 	}
 
@@ -46,7 +47,7 @@ public class Model {
 		time = int1;
 		ballInVision = false;
 		goalInVision = false;
-		flags = new LinkedList<Flag>();
+		flags.clear();
 		players = new LinkedList<Player>();
 	}
 
@@ -162,18 +163,18 @@ public class Model {
 
 
     void addObject(String description, String values) {
-        String[] desc = description.split("\\s\\\"|\\s|\\\"\\s|\\\"");
-        switch(desc[0]){
-            case("p"):
-            case("P"):
-                addPlayer(desc, values.split("\\s"));
+        switch(description.charAt(0)){
+            case('p'):
+            case('P'):
+                addPlayer(description.split("\\s\\\"|\\s|\\\"\\s|\\\""), values.split("\\s"));
                 break;
-            case("b"):
-            case("B"):
-                addBall(desc, values.split("\\s"));
+            case('b'):
+            case('B'):
+                //System.err.println("adding ball " + description + " " + values);
+                addBall(description.split("\\s\\\"|\\s|\\\"\\s|\\\""), values.split("\\s"));
                 break;
             default:
-                addFlag(desc, values.split("\\s"));
+                addFlag(description, values.split("\\s"));
         }
     }
 
@@ -233,7 +234,8 @@ public class Model {
     }
 
     private void addBall(String[] desc, String[] values) {
-        this.ball = new Ball();
+      
+        this.ball = new FieldObject();
         ballInVision = true;
         if(values.length == 1){
             this.ball.direction = Integer.parseInt(values[0]);
@@ -247,14 +249,8 @@ public class Model {
         }
     }
 
-    private void addFlag(String[] desc, String[] values) {
-        if(values.length == 3 && values[2].length()>1){
-            return;
-        }
-        Flag f = new Flag(desc[0].charAt(0));
-        for(int i = 1; i < desc.length; i++){
-            f.set(desc[i]);
-        }
+    private void addFlag(String desc, String[] values) {
+        FieldObject f = new FieldObject();
         if(values.length == 1){
             f.direction = Integer.parseInt(values[0]);
         }else if(values.length>1){
@@ -265,12 +261,12 @@ public class Model {
                 f.dirChange = Double.parseDouble(values[3]);
             }
         }
-        if (f.name == 'g') {
-            if ((field_side == 'r' && f.left) || (field_side == 'l' && f.right)) {
+        if (desc.charAt(0) == 'g') {
+            if ((field_side == 'r' && desc.contentEquals("g l")) || (field_side == 'l' && desc.contentEquals("g r"))) {
                 goalInVision = true;
                 goal = f;
             }
         }
-        flags.add(f);
+        flags.put(desc, f);
     }
 }

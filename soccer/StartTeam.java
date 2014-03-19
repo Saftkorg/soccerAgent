@@ -3,9 +3,10 @@ package soccer;
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import soccer.Formation.Pos;
 
 public class StartTeam {
-
+    /*
     public enum Formation {
 
         GOALIE(-50, 0, true),
@@ -35,7 +36,7 @@ public class StartTeam {
             this.goalie = goalie;
         }
     }
-
+    */
     /**
      *
      * @param args
@@ -54,13 +55,14 @@ public class StartTeam {
             first[0] = args[0];
         }
         try {
-            /*
-             for(Formation f : Formation.values()){
-             (new SoccerAgent(first,  f)).start();
-             (new SoccerAgent(second, f)).start();
+            
+             for(Pos p : Pos.values()){
+             (new SoccerAgent(first,  new Formation(p))).start();
+             (new SoccerAgent(second, new Formation(p))).start();
              }
-             */
-                    (new SoccerAgent(first,  Formation.FC)).start();
+             
+                    //(new SoccerAgent(first,  new Formation(Pos.GOALIE))).start();
+                    //(new SoccerAgent(first,  new Formation(Pos.FBB))).start();
 //                    (new SoccerAgent(second, Formation.GOALIE)).start();
 //                    (new SoccerAgent(first,  Formation.HBC)).start();
 //                    (new SoccerAgent(second, Formation.HBC)).start();
