@@ -18,9 +18,8 @@ public class SoccerAgent extends Thread {
 
     Model model;
     Communicator com;
-    int VERSION = 13;
+
     private final double DEGREE_DELTA = 20.0;
-    
 
     private Queue<String> commands;
 
@@ -49,7 +48,7 @@ public class SoccerAgent extends Thread {
         //x = f.x;
         //y = f.y;
         //goalie = f.goalie;
-        model = new Model(args[0]);
+        model = new Model(args[0], f.goalie);
         com = new Communicator(args[1], Integer.parseInt(args[2]), model);
 
     }
@@ -58,14 +57,15 @@ public class SoccerAgent extends Thread {
         //int holdW, coverPW, coverGW, getFreeW, goToBallW,dribbleW,kickW,passW, catchW;
 
         if (model.ballInVision) {
-            if (model.ball.distance > 45.0) {
+
+            if (model.ball.distance > 35.0) {
                 int[] retint = {1, 0, 0, 0, 0, 0, 0, 0, 0};
                 return retint;
-            } else if (model.ball.distance > 10.0 && model.ball.distance <= 45.0) {
+            } else if (model.ball.distance > 10.0) {
                 //int[] retint = {0, 1, 0, 1, 0, 0, 0, 0, 0};
                 int[] retint = {0, 0, 0, 0, 1, 0, 0, 0, 0};
                 return retint;
-            } else if (model.ball.distance > 0.7 && model.ball.distance <= 10.0) {
+            } else if (model.ball.distance > 0.7) {
                 //int[] retint = {0, 0, 0, 0, 1, 0, 0, 0, 0};
                 int[] retint = {0, 0, 0, 0, 1, 0, 0, 0, 0};
                 return retint;
@@ -85,14 +85,20 @@ public class SoccerAgent extends Thread {
     public void run() {
 
         String msg;
-        if (!f.goalie) {
-            msg = "(init " + model.getTeam() + " (version " + VERSION + "))";
-        } else {
-            msg = "(init " + model.getTeam() + " (version " + VERSION + ") (goalie))";
+        int connectCount = 0;
+        for (; connectCount < 2; connectCount++) {
+            if (com.send(model.initMsg)) {
+                break;
+            }
         }
-        com.send(msg);
+        if (connectCount == 2) {
+            com.quit();
+            System.err.println("NOPE!");
+            return;
+        }
+
         f.setSide(model.field_side);
-        msg = move(f.x, f.y);
+        msg = "(move " + f.x + " " + f.y + ")";
         int lastTime = -1;
         com.send(msg);
         model.time(-1);
@@ -101,7 +107,22 @@ public class SoccerAgent extends Thread {
             if (lastTime != model.time) {
                 lastTime = model.time;
 
+//                if (model.ballInVision && model.ball.distChange != null) {
+//                    System.err.println(model.team + model.unum + " dirchng "
+//                            + model.ball.dirChange + " distchng " + model.ball.distChange
+//                            + " dist " + model.ball.distance + " dir " + model.ball.direction +
+//                            " dirToDegr "+ Math.toDegrees(model.ball.dirChange));
+//                }
+//                if (model.ballInVision && model.ball.distChange != null) {
+//                System.err.println(model.team + model.unum + " dir " + model.ball.direction
+//                        + " dist " + model.ball.distance + " dirCh " + model.ball.dirChange
+//                        + " distChn" + model.ball.distChange + " dirSpeed " +
+//                        model.body.directionOfSpeed + " speed " + model.body.amountOfSpeed);
+//                }
                 if (!commands.isEmpty()) {
+                    // if (commands.peek().startsWith("(turn")) {
+                    //     System.err.println(model.unum + " " + commands.peek());
+                    // }
                     msg = commands.poll();
                     continue;
                 }
@@ -151,13 +172,13 @@ public class SoccerAgent extends Thread {
                 int maxScore = 0;
                 int maxInt = -1;
                 for (int i = 0; i < actionScore.length; i++) {
-                    System.err.print(actionScore[i] + " ");
+                    //System.err.print(actionScore[i] + " ");
                     if (actionScore[i] > maxScore) {
                         maxScore = actionScore[i];
                         maxInt = i;
                     }
                 }
-                System.err.println();
+                //System.err.println();
                 if (maxInt != -1) {
                     switch (maxInt) {
                         case (0):
@@ -189,44 +210,19 @@ public class SoccerAgent extends Thread {
                             break;
                     }
                 } else {
-                     lookForBallAction();
+                    lookForBallAction();
                 }
-
+                if (!commands.isEmpty()) {
+                    //if (commands.peek().startsWith("(turn")) {
+                    //    System.err.println(model.unum + " " + commands.peek());
+                    //}
+                    msg = commands.poll();
+                    continue;
+                }
             }
         }
         com.quit();
-    }
-
-    /**
-     * HoldBall(): Remain stationary while keeping possession of the ball in a
-     * position that is as far away from the opponents as possible.
-     */
-    private String holdBall() {
-        //System.err.println("Holding ball");
-        return kick(15.0, 45.0); // TODO
-    }
-
-    /**
-     * PassBall(k): Kick the ball directly towards keeper k.
-     *
-     * @param k index of player to kick the ball towards.
-     */
-    private String passBall(int k) {
-        return kick(50.0, model.players.get(k).direction); // TODO - obvious
-    }
-
-    /**
-     * GetOpen(): Move to a position that is free from opponents and open for a
-     * pass from the ball's current position (using SPAR (Veloso et al., 1999)).
-     */
-    private String getOpen() {
-        if (!model.ballInVision) {
-            return scanField();
-        }
-        if (model.ball.direction > 0) {
-            return dash(50.0, model.ball.direction - 180);
-        }
-        return dash(50.0, 180 + model.ball.direction); // TODO - derp
+        System.err.println("quitting agent");
     }
 
     /**
@@ -243,188 +239,21 @@ public class SoccerAgent extends Thread {
         //}
         //System.err.format("%s ball at %d degrees %n",model.team, model.ball.degree);
         //System.err.format("ball at %f distanceChange, our speed: %f %n", model.ball.distChange, model.body.amountOfSpeed);
-
         if (model.ball.direction > 5 || model.ball.direction < -5) {
-            commands.add("(turn_neck " + (-model.body.headAngle) + ")");
-            commands.add("(turn " + (model.ball.direction + model.body.headAngle) + ")");
-            commands.add("(dash 75.0)");
+            //commands.add("(turn_neck " + (-model.body.headAngle) + ")");
+            commands.add("(turn " + (model.ball.direction /*+ model.body.headAngle*/) + ")");
+            //commands.add("(dash 75.0)");
             //return turn(model.ball.direction);
         } else {
-            commands.add("(dash 75.0)");// "(dash 50.0 15.0)";
+            if (model.ball.dirChange != null) {
+
+                commands.add("(dash 75.0 " + (model.ball.direction * (-model.ball.distChange)) + ")");
+            } else {
+                commands.add("(dash 75.0)");// "(dash 50.0 15.0)";
+            }
         }
-
     }
 
-    /**
-     * kick the ball directly at the goal. TODO - avoid goal keeper. Only use
-     * when goal is visible
-     *
-     * @return
-     */
-    public String goalKick() {
-        if (!model.goalInVision) {
-            //System.err.println("Cannot see goal. Don't try to hit it!");
-            return scanField();
-        }
-        return kick(100.0, model.goal.direction); // TODO
-    }
-
-    private String scanField() {
-        return turn(70);
-    }
-
-    //private double wGoalKick = 1.0 - r.nextDouble();
-    //private double wPass = 100.0 - r.nextDouble();
-    private void decideAction() {
-        // TODO check model
-        // TODO make decision
-        // TODO compile message to send
-        //String retmsg = "";
-
-        /*
-         if (model.ballInVision) {
-         System.err.println("balldist " + model.ball.distance);
-         if (model.ball.distance > 45.0) {
-
-         } else if (model.ball.distance > 20.0 && model.ball.distance <= 45.0) {
-
-         } else if (model.ball.distance > 0.7) {
-         if (Math.abs(model.ball.direction) > 5) {
-         commands.add("(turn " + (model.ball.direction + model.body.headAngle) + ")");
-         }
-         commands.add("(dash 75)");
-         if (Math.abs(model.body.headAngle) > 1) {
-         commands.add("(turn_neck " + (-model.body.headAngle) + ")");
-         }
-
-         } else {
-         if (model.goalInVision && model.goal.distance < 30) {
-         FieldObject fot = model.flags.get("f g r t");
-         FieldObject fob = model.flags.get("f g r b");
-         if (fot != null && fob != null) {
-
-         int pifog = 0;
-
-         int[] opendir = new int[fob.direction - fot.direction];
-
-         for (Player p : model.players) {
-         if (p.direction < fob.direction && p.direction > fot.direction) {
-         pifog++;
-         opendir[p.direction - fot.direction]++;
-         }
-         }
-         if (pifog / (fob.direction - fot.direction) < 1.0) {
-         int smallest = 20;
-         int degree = 0;
-         for (int i = 0; i < opendir.length; i++) {
-         if (opendir[i] < smallest) {
-         degree = i;
-         smallest = opendir[i];
-         }
-         }
-         commands.add("(kick 100 " + model.goal.direction + ")");
-         } else {
-         int closeEnemy = 0;
-         for (Player p : model.players) {
-         if (p.distance < 10) {
-         if (p.team != null && p.team.equals(model.team)) {
-         continue;
-         }
-         closeEnemy++;
-         }
-         }
-         if (closeEnemy > 5) {
-         for (Player p : model.players) {
-         if (p.team != null && p.team.equals(model.team)) {
-         commands.add("(kick " + (p.distance * 2) + " " + p.direction + ")");
-         break;
-         }
-         }
-         } else {
-         commands.add("(kick 30 " + (-model.goal.direction) + ")");
-         commands.add("(turn " + (-model.goal.direction) + ")");
-         commands.add("(dash 75)");
-         }
-
-         }
-
-         } else {
-         commands.add("(turn_neck " + model.goal.direction + ")");
-         commands.add("(kick 40)");
-         commands.add("(dash 70)");
-
-         }
-
-         }
-         commands.add("(kick 30 30)");
-         commands.add("(turn 30)");
-         commands.add("(dash 45)");
-         }
-         } else {
-         commands.add(scanField());
-         }
-      
-         */
-    }
-
-    /**
-     * BlockPass(k): Move to a position between the keeper with the ball and
-     * keeper k.
-     */
-    /**
-     * Only used before the game starts to place the players on their starting
-     * locations.
-     *
-     * @param x
-     * @param y
-     */
-    private String move(double x, double y) {
-        return ("(move " + Double.toString(x) + " " + Double.toString(y) + ")");
-    }
-
-    /**
-     *
-     * @param moment degrees turning angle. 90 is 90 degrees right.
-     */
-    private String turn(int moment) {
-        //System.err.println("Turn " + model.Unum + " " + model.team);
-        avoidFKF = false;
-        return ("(turn " + moment + ")");
-    }
-
-    /**
-     * This is the main movement command used to move the players during a game.
-     *
-     * @param power Double check this: percentage power. 100 is max.
-     */
-    private String dash(double power) {
-        //System.err.println("Dash " + model.Unum + " " + model.team);
-        return ("(dash " + Double.toString(power) + ")");
-    }
-
-    private String dash(double power, double direction) {
-        //System.err.println("Dash " + model.Unum + " " + model.team);
-        return ("(dash " + Double.toString(power) + " "
-                + Double.toString(direction) + ")");
-    }
-
-    private String kick(double power, double direction) {
-        if (avoidFKF) {
-            return faceBall();
-        }
-        //System.err.println("Kick " + model.Unum + " " + model.team);
-        avoidFKF = true;
-        return ("(kick " + Double.toString(power) + " "
-                + Double.toString(direction) + ")");
-    }
-
-    private String faceBall() {
-        //System.err.println("faceball " + model.ballInVision);
-        if (model.ballInVision) {
-            return turn(model.ball.direction);
-        }
-        return scanField();
-    }
 
     public boolean hasBall() {
         return model.ball.distance <= 0.7;
@@ -445,23 +274,6 @@ public class SoccerAgent extends Thread {
             }
         }
         return weight;
-    }
-
-    private void dashback() {
-        commands.add("(turn 45)");
-        commands.add("(dash 45)");
-        if (model.body.headAngle != 0) {
-            commands.add("(turn_neck " + (-model.body.headAngle) + ")");
-        }
-        commands.add("(dash 45)");
-    }
-
-    private void dashfrwd() {
-        commands.add("(dash 45)");
-        if (model.body.headAngle != 0) {
-            commands.add("(turn_neck " + (-model.body.headAngle) + ")");
-        }
-        commands.add("(dash 45)");
     }
 
     private int holdEval() {
@@ -493,8 +305,12 @@ public class SoccerAgent extends Thread {
     }
 
     private int goToBallEval() {
-        double dBallDist = 2 * model.ball.distance;
+        double dBallDist = 1.8 * model.ball.distance;//1.9 * model.ball.distance; //double ball distance 
         int ret = 1;
+        if (model.ball.distChange != null && model.ball.distChange < -0.1) {
+            return ret;
+        }
+
         for (Player pl : model.players) {
             if (model.team.equals(pl.team)) {
                 if (pl.distance < dBallDist) {
@@ -519,16 +335,16 @@ public class SoccerAgent extends Thread {
     }
 
     private int kickEval() {
-        if(model.goalInVision && model.goal.distance<30){
+        if (model.goalInVision && model.goal.distance < 30) {
             return 2;
-        }else{
+        } else {
             return 0;
         }
     }
 
     private int passEval() {
         for (Player pl : model.players) {
-            if (model.team.equals(pl.team) && pl.distance<50) {
+            if (model.team.equals(pl.team) && pl.distance < 50) {
                 return 2;
             }
         }
@@ -585,7 +401,15 @@ public class SoccerAgent extends Thread {
             }
         }
         if (commands.isEmpty()) {
-            commands.add("(turn 0)");
+            if (model.ballInVision && model.ball.distance > 35) {
+                if (Math.abs(model.ball.direction) > 20) {
+                    commands.add("(turn " + model.ball.direction + ")");
+                }
+
+            } else {
+                commands.add("(turn 0)");
+            }
+
         }
     }
 
@@ -602,17 +426,48 @@ public class SoccerAgent extends Thread {
     }
 
     private void goToBallAction() {
-        if (Math.abs(model.ball.direction) > 5 && model.ball.distance > 1.0) {
+        if (Math.abs(model.ball.direction) > 20) {
             //System.err.println("dir " + model.ball.direction + " dirChange " + model.ball.dirChange);
-            if (model.ball.dirChange != null) {
-                commands.add("(turn " + (model.ball.direction + model.ball.dirChange) + ")");
+            if (model.ball.dirChange != null ) {
+                commands.add("(turn " + (model.ball.direction + ( model.ball.dirChange)) + ")");
             } else {
                 commands.add("(turn " + model.ball.direction + ")");
             }
+        }else if (model.ball.distance > 0.7) {
+            if (model.ball.dirChange != null && Math.abs(model.ball.dirChange)>0.1 && Math.abs(model.ball.distChange)>0.1) {
+               double turnThis;
+                if(model.ball.distChange <-0.1){
+                    turnThis = (model.ball.direction + 
+                            2*(Math.toDegrees(Math.asin((model.ball.distance*Math.sin(Math.toRadians(model.ball.dirChange)))/Math.abs(model.ball.distChange)))));
+
+                    //commands.add("(dash " + 100 + " " + turnThis + ")");
+                 
+                }else{
+                    turnThis = 
+                      //                 commands.add("(dash " + 100 + " " + 
+                        (model.ball.direction + 
+                                (Math.toDegrees(Math.asin((model.ball.distance*Math.sin(Math.toRadians(model.ball.dirChange)))/Math.abs(model.ball.distChange)))));
+                 
+                }
+                
+                if(turnThis == Double.NaN){
+                    turnThis = model.ball.direction;
+                }
+                commands.add("(dash " + 100 + " " +turnThis + ")");
+                //System.err.println(commands.peek());
+            } else {
+                commands.add("(dash 95)");
+            }
         }
-        if (model.ball.distance > 0.7) {
-            commands.add("(dash " + 95 + ")");
-        }
+
+    }
+
+    private double lawofcos(double a, double b, int degr) {
+        return Math.sqrt(Math.pow(a, 2.0) + Math.pow(b, 2.0) - (2 * a * b * Math.cos(Math.toRadians(degr))));
+    }
+
+    private double lawofcos(double a, double b, double degr) {
+        return Math.sqrt(Math.pow(a, 2.0) + Math.pow(b, 2.0) - (2 * a * b * Math.cos(Math.toRadians(degr))));
     }
 
     private void dribbleAction() {
@@ -633,20 +488,20 @@ public class SoccerAgent extends Thread {
                     rightScore = 5;
                 }
             }
-        }else{
+        } else {
             //FieldObject fot = ;
             //FieldObject fob = model.flags.get("l b");
-            
-            if(model.flags.get("l t")!= null){
-                if(model.field_side == 'l'){
+
+            if (model.flags.get("l t") != null) {
+                if (model.field_side == 'l') {
                     rightScore = 10;
-                }else{
+                } else {
                     leftScore = 10;
                 }
-            }else if(model.flags.get("l b")!= null){
-                if(model.field_side == 'l'){
+            } else if (model.flags.get("l b") != null) {
+                if (model.field_side == 'l') {
                     leftScore = 10;
-                }else{
+                } else {
                     rightScore = 10;
                 }
             }
@@ -656,35 +511,35 @@ public class SoccerAgent extends Thread {
         for (Player p : model.players) {
             if (!model.team.equals(p.team)) {
                 if (Math.abs(p.direction) < 15) {
-                    middleScore -= (10 / p.distance);
-                    
+                    middleScore -= (10 / (p.distance + 1));
+
                 } else {
                     if (p.direction < 0) {
-                        leftScore -= (10/p.distance);
+                        leftScore -= (10 / (p.distance + 1));
                     } else {
-                        rightScore -= (10/p.distance);
+                        rightScore -= (10 / (p.distance + 1));
                     }
-                    
+
                 }
             }
         }
         if (middleScore > leftScore && middleScore > rightScore) {
             //go left
             commands.add("(kick 15 0)");
-            
+
         } else {
-            if(leftScore > rightScore ){
-                commands.add("(kick 10 " + (leftDegree)+ ")");
+            if (leftScore > rightScore) {
+                commands.add("(kick 10 " + (leftDegree) + ")");
                 commands.add("(turn " + (leftDegree) + ")");
-            }else{
-                commands.add("(kick 10 " + (rightDegree)+ ")");
+            } else {
+                commands.add("(kick 10 " + (rightDegree) + ")");
                 commands.add("(turn " + (rightDegree) + ")");
-            }     
+            }
         }
     }
 
     private void kickAction() {
-        commands.add("(kick 100 "+ (model.goal.direction + (r.nextInt(20)-10) )+")");
+        commands.add("(kick 100 " + (model.goal.direction + (r.nextInt(20) - 10)) + ")");
     }
 
     private void passAction() {
@@ -700,9 +555,9 @@ public class SoccerAgent extends Thread {
             }
         }
         int rand = r.nextInt(count);
-        double power = (2.5*distance[rand]);
-        commands.add("(kick " + (power>100.0 ? 100.0 : power) + " " + degrees[rand] + ")");
-                
+        double power = (2.5 * distance[rand]);
+        commands.add("(kick " + (power > 100.0 ? 100.0 : power) + " " + degrees[rand] + ")");
+
     }
 
     private void catchAction() {
@@ -711,6 +566,10 @@ public class SoccerAgent extends Thread {
 
     private void lookForBallAction() {
         //System.err.println("lookForBall");
-        commands.add(faceBall());
+        if (model.ballInVision) {
+            commands.add("(turn " + model.ball.direction + ")");
+        } else {
+            commands.add("(turn 90)");
+        }
     }
 }

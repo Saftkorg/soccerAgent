@@ -10,17 +10,25 @@ public class Model {
 	char field_side;
 	int unum;
 	int time;
+        //int prevtime;
+        String initMsg;
+        int VERSION = 13;
+        String recMsg ;
 
 	HashMap<String, FieldObject> flags;
 	List<Player> players;
         Body body;
 	FieldObject ball;
+        //FieldObject prevball;
 	FieldObject goal;
 	boolean goalInVision;
 	boolean ballInVision;
+        boolean goalie;
 
-	public Model(String team) {
+	public Model(String team, boolean goalie) {
 		this.team = team;
+                this.goalie = goalie;
+                initMsg = "(init "+ team + " (version "+ VERSION + ")" + (goalie ? " (goalie)":"")+")";
 		time = -1;
 		ballInVision = false;
 		goalInVision = false;
@@ -44,11 +52,14 @@ public class Model {
 
 	public void time(int int1) {
 		// TODO Auto-generated method stub
+                //prevtime = time;
+                //prevball = ball;
 		time = int1;
 		ballInVision = false;
 		goalInVision = false;
 		flags.clear();
-		players = new LinkedList<Player>();
+                players.clear();
+		//players = new LinkedList<Player>();
 	}
 
 
@@ -234,17 +245,17 @@ public class Model {
     }
 
     private void addBall(String[] desc, String[] values) {
-      
-        this.ball = new FieldObject();
+        //prevball = ball;
+        ball = new FieldObject();
         ballInVision = true;
         if(values.length == 1){
-            this.ball.direction = Integer.parseInt(values[0]);
+            ball.direction = Integer.parseInt(values[0]);
         }else if(values.length>1){
-            this.ball.distance = Double.parseDouble(values[0]);
-            this.ball.direction = Integer.parseInt(values[1]);
+            ball.distance = Double.parseDouble(values[0]);
+            ball.direction = Integer.parseInt(values[1]);
             if(values.length>2){
-                this.ball.distChange = Double.parseDouble(values[2]);
-                this.ball.dirChange = Double.parseDouble(values[3]);
+                ball.distChange = Double.parseDouble(values[2]);
+                ball.dirChange = Double.parseDouble(values[3]);
             }
         }
     }
