@@ -13,7 +13,7 @@ import java.util.Random;
  * @author Gomez, Alexander
  *
  */
-public class SoccerAgent extends Thread {
+public class SoccerAgentDumb extends Thread {
 
     private final Model model;
     private final Communicator com;
@@ -39,7 +39,7 @@ public class SoccerAgent extends Thread {
      * @throws UnknownHostException
      * @throws NumberFormatException
      */
-    public SoccerAgent(String[] args, Formation f) throws NumberFormatException,
+    public SoccerAgentDumb(String[] args, Formation f) throws NumberFormatException,
             UnknownHostException, SocketException {
         commands = new LinkedList();
         this.f = f;
@@ -57,33 +57,31 @@ public class SoccerAgent extends Thread {
         
         if (model.ballInVision) {
 
-            //if (model.ball.distance > 35.0) {
-            if (model.ball.distance > model.parameters[Model.FAR_BALL_DIST]) {
-            
-                return model.farArray;
-                //int[] retint = {1, 0, 0, 0, 0, 0, 0, 0, 0};
-                //return retint;
+            if (model.ball.distance > 35.0) {
+
+                double[] retint = {1, 0, 0, 0, 0, 0, 0, 0, 0};
+                return retint;
                 
             } else if (model.ball.distance > model.parameters[Model.MED_BALL_DIST]) {
                 //int[] retint = {0, 1, 0, 1, 0, 0, 0, 0, 0};
-                return model.medArray;
-                //double[] retint = {0, 0, 0, 0, 1, 0, 0, 0, 0};
-                //return retint;
+
+                double[] retint = {0, 0, 0, 0, 1, 0, 0, 0, 0};
+                return retint;
             } else if (model.ball.distance > 0.7) {
                 //int[] retint = {0, 0, 0, 0, 1, 0, 0, 0, 0};
-                return model.cloArray;
-                //double[] retint = {0, 0, 0, 0, 1, 0, 0, 0, 0};
-                //return retint;
+
+                double[] retint = {0, 0, 0, 0, 1, 0, 0, 0, 0};
+                return retint;
             } else {
                 //int[] retint = {0, 0, 0, 0, 0, 1, 1, 1, 0};
-                return model.hasArray;
-                //double[] retint = {0, 0, 0, 0, 0, 1, 1, 1, 0};
-                //return retint;
+
+                double[] retint = {0, 0, 0, 0, 0, 1, 1, 1, 0};
+                return retint;
             }
         } else {
-            return model.nobArray;
-            //double[] retint = {1, 0, 0, 0, 0, 0, 0, 0, 0};
-            //return retint;
+
+            double[] retint = {1, 0, 0, 0, 0, 0, 0, 0, 0};
+            return retint;
         }
     }
 
@@ -110,10 +108,7 @@ public class SoccerAgent extends Thread {
         model.time(0);
         while (com.send(msg)) {
             msg = null;
-            if(model.freeMove){
-                msg = "(move " + f.x + " " + f.y + ")";
-                model.freeMove = false;
-            }else if (lastTime != model.time) {
+            if (lastTime != model.time) {
                 lastTime = model.time;
 
                 if (!commands.isEmpty()) {
@@ -136,23 +131,23 @@ public class SoccerAgent extends Thread {
                                 break;
                             case (1):
                                 actionScore[i] = actionW[i] * coverPEval();
-                                
+                               
                                 break;
                             case (2):
                                 actionScore[i] = actionW[i] * coverGEval();
-                                
+                               
                                 break;
                             case (3):
                                 actionScore[i] = actionW[i] * getFreeEval();
-                                
+                               
                                 break;
                             case (4):
                                 actionScore[i] = actionW[i] * goToBallEval();
-                               
+                                
                                 break;
                             case (5):
                                 actionScore[i] = actionW[i] * dribbleEval();
-                              
+                                
                                 break;
                             case (6):
                                 actionScore[i] = actionW[i] * kickEval();
@@ -160,11 +155,11 @@ public class SoccerAgent extends Thread {
                                 break;
                             case (7):
                                 actionScore[i] = actionW[i] * passEval();
-                                
+                               
                                 break;
                             case (8):
                                 actionScore[i] = actionW[i] * catchEval();
-                               
+                                
                                 break;
                         }
                     } else {
@@ -300,7 +295,7 @@ public class SoccerAgent extends Thread {
     private double dribbleEval() {
         double ret = 1.0;
         for (Player pl : model.players) {
-            if (!model.team.equals(pl.team) && pl.distance < model.parameters[model.DRB_DIST_EVAL]) {
+            if (!model.team.equals(pl.team) && pl.distance < 5) {
                 return 0.5; 
             }
         }
@@ -312,7 +307,7 @@ public class SoccerAgent extends Thread {
      * @return 
      */
     private int kickEval() {
-        if (model.goalInVision && model.goal.distance < model.parameters[model.KCK_GOALDIST_EVAL]) {
+        if (model.goalInVision && model.goal.distance < 30) {
             return 2;
         } else {
             return 0;
@@ -321,7 +316,7 @@ public class SoccerAgent extends Thread {
 
     private int passEval() {
         for (Player pl : model.players) {
-            if (model.team.equals(pl.team) && pl.distance < model.parameters[model.PAS_PLYRDIST_EVAL]) {
+            if (model.team.equals(pl.team) && pl.distance < 35) {
                 return 2;
             }
         }

@@ -1,45 +1,13 @@
 package soccer;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
 import soccer.Formation.Pos;
 
 public class StartTeam {
-    /*
-     public enum Formation {
-
-     GOALIE(-50, 0, true),
-     FBB(-35, 20),
-     FBCB(-35, 7),
-     FBCT(-35, -7),
-     FBT(-35, -20),
-     HBB(-20, 14),
-     HBT(-20, -14),
-     HBC(-20, 0),
-     FT(-6, -17),
-     FC(-10, 0),
-     FB(-6, 17);
-     int x;
-     int y;
-     boolean goalie;
-
-     Formation(int x, int y) {
-     this.x = x;
-     this.y = y;
-     this.goalie = false;
-     }
-
-     Formation(int x, int y, boolean goalie) {
-     this.x = x;
-     this.y = y;
-     this.goalie = goalie;
-     }
-     }
-     */
-
     /**
      *
      * @param args
@@ -48,52 +16,78 @@ public class StartTeam {
     public static void main(String[] args) throws IOException {
 //		Runtime.getRuntime().exec("C:/Users/Viktor/rcssserver/rcssserver-15.0.0-win/rcssserver.exe", null, new File("C:/Users/Viktor/rcssserver/rcssserver-15.0.0-win"));
 //		Runtime.getRuntime().exec("C:/Users/Viktor/rcssserver/rcssmonitor-14.1.0-win/rcssmonitor.exe", null, new File("C:/Users/Viktor/rcssserver/rcssmonitor-14.1.0-win"));
+      
+        ProcessBuilder pb = new ProcessBuilder("C:\\Users\\Alexander\\Documents\\Alex Skola\\kex\\rcssserver-15.0.0-win\\rcssserver.exe");
+       pb.directory(new File("C:\\Users\\Alexander\\Documents\\Alex Skola\\kex\\rcssserver-15.0.0-win\\"));
+        Process server = pb.start();
+//InputStream serverIS = server.getInputStream();
+        //byte[] buffer = new byte[4096];
+        //try {
+        //    Thread.sleep(1 * 4 * 1000);
+        //} catch (InterruptedException ex) {
+        //    Thread.currentThread().interrupt();
+        //}
+        //serverIS.read(buffer);
+        //System.err.println(new String(buffer));
+        
+       //ProcessBuilder builder = new ProcessBuilder(new String[] { "cmd.exe", "/C", "\"C:\\Users\\Alexander\\Documents\\Alex Skola\\kex\\rcssserver-15.0.0-win\\rcssserver.exe\"" });
+        //ProcessBuilder builder = new ProcessBuilder(new String[] { "cmd.exe", "/C", "start" });
+       //Process server = builder.start();
+       
+       
+        
+        Process monitor = new ProcessBuilder("C:\\Users\\Alexander\\Documents\\Alex Skola\\kex\\rcssmonitor-14.1.0-win\\rcssmonitor.exe").start();
 
-        final Process server = new ProcessBuilder("C:\\Users\\Alexander\\Documents\\Alex Skola\\kex\\rcssserver-15.0.0-win\\rcssserver.exe").start();
-        InputStream serverIS = server.getInputStream();
-        serverIS.read();
-        serverIS.close();
-
-        final Process monitor = new ProcessBuilder("C:\\Users\\Alexander\\Documents\\Alex Skola\\kex\\rcssmonitor-14.1.0-win\\rcssmonitor.exe").start();
-
-        String[] first = {"MyTeam", "localhost", "6000"};
-        String[] second = {"MyTheme", "localhost", "6000"};
+        String[] first = {"Learn", "localhost", "6000"};
+        String[] second = {"Dumb", "localhost", "6000"};
+        String[] coach = {"Learn", "localhost", "6001"};
         //String[] first = { "MyTeam", "192.168.1.4", "6000" };
         //String[] second = { "MyTheme", "192.168.1.4", "6000"  };
         if (args.length > 0) {
             first[0] = args[0];
         }
+        
+        
+        try {
+            
+            Thread.sleep(1 * 2 * 1000);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        
+        
         try {
 
             for (Pos p : Pos.values()) {
                 (new SoccerAgent(first, new Formation(p))).start();
-                (new SoccerAgent(second, new Formation(p))).start();
+                (new SoccerAgentDumb(second, new Formation(p))).start();
             }
-       //     (new SoccerAgent(first, new Formation(Pos.FBT))).start();
-      //      (new SoccerAgent(first, new Formation(Pos.FBB))).start();
+            
+            (new Coach(coach)).start();
+            //(new SoccerAgent(first, new Formation(Pos.FBT))).start();
+           //(new SoccerAgent(second, new Formation(Pos.FBB))).start();
+            
+            
      //              (new SoccerAgent(second, new Formation(Pos.GOALIE))).start();
      //               (new SoccerAgent(first,  new Formation(Pos.FC))).start();
     //               (new SoccerAgent(second, new Formation(Pos.FBT))).start();
-        } catch (NumberFormatException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (SocketException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+           
+           
+        } catch (NumberFormatException | UnknownHostException | SocketException e) {
+            
         }
 
-      
-
+        
+        
         try {
             
-            Thread.sleep(1 * 20 * 1000);
+            Thread.sleep(1 * 60 * 1000);
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
+        //serverIS.close();
         server.destroy();
+        
         monitor.destroy();
         
         /*
