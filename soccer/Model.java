@@ -66,6 +66,7 @@ public class Model {
     double[] parameters ;
     String team;
     char field_side;
+    char opp_field_side;
     int unum;
     int time;
     String initMsg;
@@ -81,6 +82,7 @@ public class Model {
     boolean goalie;
     boolean freeMove;
     boolean kickIn;
+    double threshold_adjuster = 0;
 
     public Model(String team, boolean goalie) {
         
@@ -100,6 +102,13 @@ public class Model {
     void setFieldSide(char field_side) {
         // TODO Auto-generated method stub
         this.field_side = field_side;
+        
+        if(field_side == 'l'){
+            this.opp_field_side = 'r';
+        }else{
+            this.opp_field_side = 'l';
+        }
+        
     }
 
     void setUnum(int unum) {
@@ -331,7 +340,7 @@ public class Model {
             }
         }
         if (desc.charAt(0) == 'g') {
-            if ((field_side == 'r' && desc.contentEquals("g l")) || (field_side == 'l' && desc.contentEquals("g r"))) {
+            if ( opp_field_side == desc.charAt(desc.length()-1)) {
                 goalInVision = true;
                 goal = f;
             }

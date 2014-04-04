@@ -44,6 +44,7 @@ public class Formation {
     int x, y;
     char field_side;
     boolean goalie;
+    int away_from_ball;
     List<Threshold> thresholds;
 
     Formation(Pos p) {
@@ -58,6 +59,7 @@ public class Formation {
                 x = -50;
                 y = 0;
                 goalie = true;
+                away_from_ball = 80;
                 //flags[0] = "l r";
                 min[0] = 90;
                 max[0] = 105;
@@ -75,6 +77,7 @@ public class Formation {
             case FBB:
                 x = -35;
                 y = 20;
+                away_from_ball = 50;
                 //flags[0] = "l r";
                 min[0] = 75;
                 max[0] = 90;
@@ -90,6 +93,7 @@ public class Formation {
                 break;
             case FBCB:
                 //flags[0] = "l r";
+                away_from_ball = 50;
                 min[0] = 75;
                 max[0] = 90;
                 //flags[1] = "l t";
@@ -106,6 +110,7 @@ public class Formation {
                 break;
             case FBCT:
                 //flags[0] = "l r";
+                away_from_ball = 50;
                 min[0] = 75;
                 max[0] = 90;
                 //flags[1] = "l t";
@@ -122,6 +127,7 @@ public class Formation {
                 break;
             case FBT:
                 //flags[0] = "l r";
+                away_from_ball = 50;
                 min[0] = 75;
                 max[0] = 90;
                 //flags[1] = "l t";
@@ -138,6 +144,7 @@ public class Formation {
                 break;
             case HBB:
                 //flags[0] = "l r";
+                away_from_ball = 30;
                 min[0] = 65;
                 max[0] = 75;
                 //flags[1] = "l t";
@@ -153,6 +160,7 @@ public class Formation {
                 y = 14;
                 break;
             case HBT:
+                away_from_ball = 30;
                 //flags[0] = "l r";
                 min[0] = 65;
                 max[0] = 75;
@@ -169,6 +177,7 @@ public class Formation {
                 y = -14;
                 break;
             case HBC:
+                away_from_ball = 30;
                 //flags[0] = "l r";
                 min[0] = 65;
                 max[0] = 75;
@@ -185,6 +194,7 @@ public class Formation {
                 y = 0;
                 break;
             case FT:
+                away_from_ball = 10;
                 //flags[0] = "l r";
                 min[0] = 45;
                 max[0] = 65;
@@ -201,6 +211,7 @@ public class Formation {
                 y = -17;
                 break;
             case FC:
+                away_from_ball = 10;
                 //flags[0] = "l r";
                 min[0] = 45;
                 max[0] = 65;
@@ -217,6 +228,7 @@ public class Formation {
                 y = 0;
                 break;
             case FB:
+                away_from_ball = 10;
                 //flags[0] = "l r";
                 min[0] = 45;
                 max[0] = 65;

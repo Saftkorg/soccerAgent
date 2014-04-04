@@ -82,7 +82,7 @@ public class CoachCom{
 
             //System.err.println(msg);
         } else if (msg.startsWith("(hear")) {
-            System.err.println(msg);
+            //System.err.println(msg);
             hearMsg();
         } else if(msg.startsWith("(ok team_names")){
             model.teamSide = msg.charAt(msg.indexOf(model.teamName)-2);
@@ -104,7 +104,7 @@ public class CoachCom{
             }else{
                 model.score--;
             }
-            System.err.println(msg);
+            //System.err.println(msg);
         }
     }
     

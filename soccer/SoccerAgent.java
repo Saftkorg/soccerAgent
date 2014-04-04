@@ -19,11 +19,9 @@ public class SoccerAgent extends Thread {
     private final Communicator com;
 
     //private final double DEGREE_DELTA = 20.0;
-
     private final Queue<String> commands;
 
     //private final boolean avoidFKF = false;
-
     private final Random r = new Random();
 
     private final Formation f;
@@ -54,16 +52,15 @@ public class SoccerAgent extends Thread {
     private double[] getWeights() {
         //int holdW, coverPW, coverGW, getFreeW, goToBallW,dribbleW,kickW,passW, catchW;
 
-        
         if (model.ballInVision) {
 
             //if (model.ball.distance > 35.0) {
             if (model.ball.distance > model.parameters[Model.FAR_BALL_DIST]) {
-            
+
                 return model.farArray;
                 //int[] retint = {1, 0, 0, 0, 0, 0, 0, 0, 0};
                 //return retint;
-                
+
             } else if (model.ball.distance > model.parameters[Model.MED_BALL_DIST]) {
                 //int[] retint = {0, 1, 0, 1, 0, 0, 0, 0, 0};
                 return model.medArray;
@@ -110,17 +107,17 @@ public class SoccerAgent extends Thread {
         model.time(0);
         while (com.send(msg)) {
             msg = null;
-            if(model.freeMove){
+            if (model.freeMove) {
                 msg = "(move " + f.x + " " + f.y + ")";
                 model.freeMove = false;
-            }else if (lastTime != model.time) {
+            } else if (lastTime != model.time) {
                 lastTime = model.time;
 
                 if (!commands.isEmpty()) {
                     msg = commands.poll();
                     continue;
                 }
-                
+
                 double[] actionW = getWeights();
                 double[] actionScore = new double[actionW.length];
 
@@ -132,39 +129,39 @@ public class SoccerAgent extends Thread {
                         switch (i) {
                             case (0):
                                 actionScore[i] = actionW[i] * holdEval();
-                                
+
                                 break;
                             case (1):
                                 actionScore[i] = actionW[i] * coverPEval();
-                                
+
                                 break;
                             case (2):
                                 actionScore[i] = actionW[i] * coverGEval();
-                                
+
                                 break;
                             case (3):
                                 actionScore[i] = actionW[i] * getFreeEval();
-                                
+
                                 break;
                             case (4):
                                 actionScore[i] = actionW[i] * goToBallEval();
-                               
+
                                 break;
                             case (5):
                                 actionScore[i] = actionW[i] * dribbleEval();
-                              
+
                                 break;
                             case (6):
                                 actionScore[i] = actionW[i] * kickEval();
-                                
+
                                 break;
                             case (7):
                                 actionScore[i] = actionW[i] * passEval();
-                                
+
                                 break;
                             case (8):
                                 actionScore[i] = actionW[i] * catchEval();
-                               
+
                                 break;
                         }
                     } else {
@@ -224,36 +221,35 @@ public class SoccerAgent extends Thread {
         System.err.println("quitting agent");
     }
 
-    public boolean hasBall() {
-        return model.ball.distance <= 0.7;
-    }
-
-    private int calcscRepo() {
-        int weight = 0;
-        FieldObject fo;
-        for (Threshold t : f.thresholds) {
-            fo = model.flags.get(t.name);
-            if (fo == null) {
-                continue;
-            }
-            if (fo.distance < t.min) {
-                weight -= 20;
-            } else if (fo.distance > t.max) {
-                weight += 20;
-            }
-        }
-        return weight;
-    }
-
     private int holdEval() {
         int ret = 0;
         //String[] lines = {"l t", "l b", "l r", "l l"};
-        double dist;
+
+        //double dist;
         for (Threshold th : f.thresholds) {
+
             FieldObject fo = model.flags.get(th.name);
             if (fo != null) {
                 fo.distance = Math.abs(fo.distance * Math.sin(Math.toRadians(fo.direction)));
-                if (fo.distance < th.min || fo.distance > th.max) {
+
+                if (th.name.charAt(th.name.length() - 1) == model.opp_field_side) {
+                    if (model.ballInVision) {
+                        model.threshold_adjuster = (model.ball.distance - f.away_from_ball);
+                    }
+                    if (fo.distance < th.min - model.threshold_adjuster || fo.distance > th.max - model.threshold_adjuster) {
+                        ret++;
+                    }
+                    
+                } else if (th.name.charAt(th.name.length() - 1) == model.field_side) {
+                    if (model.ballInVision) {
+                        model.threshold_adjuster = 0;
+
+                    }
+                    if (fo.distance < th.min + model.threshold_adjuster || fo.distance > th.max + model.threshold_adjuster) {
+                        ret++;
+                    }
+                    
+                }else if (fo.distance < th.min || fo.distance > th.max) {
                     ret++;
                 }
             }
@@ -274,9 +270,9 @@ public class SoccerAgent extends Thread {
     }
 
     private double goToBallEval() {
-        
+
         double dBallDist = 1.8 * model.ball.distance;//1.9 * model.ball.distance; //double ball distance 
-        double ret = -(Math.pow(model.ball.distance,2.1)/10000)+1.2;//1.2;
+        double ret = -(Math.pow(model.ball.distance, 2.1) / 10000) + 1.2;//1.2;
         if (model.ball.distChange != null && model.ball.distChange < -0.1) {
             return ret;
         }
@@ -293,15 +289,17 @@ public class SoccerAgent extends Thread {
         }
         return ret;
     }
+
     /**
      * Always returns 1...not good?
-     * @return 
+     *
+     * @return
      */
     private double dribbleEval() {
         double ret = 1.0;
         for (Player pl : model.players) {
             if (!model.team.equals(pl.team) && pl.distance < model.parameters[model.DRB_DIST_EVAL]) {
-                return 0.5; 
+                return 0.5;
             }
         }
         return ret;
@@ -309,7 +307,8 @@ public class SoccerAgent extends Thread {
 
     /**
      * good to shoot but maybe need some more analysis of opponent players
-     * @return 
+     *
+     * @return
      */
     private int kickEval() {
         if (model.goalInVision && model.goal.distance < model.parameters[model.KCK_GOALDIST_EVAL]) {
@@ -329,12 +328,12 @@ public class SoccerAgent extends Thread {
     }
 
     private int catchEval() {
-        return 0 ;
+        return 0;
     }
 
     /**
-     * Hold position consistent with the formation thresholds, 
-     * angels given by the server for the lines aren't to the closest point
+     * Hold position consistent with the formation thresholds, angels given by
+     * the server for the lines aren't to the closest point
      */
     private void holdAction() {
         //String[] lines = {"l t", "l b", "l r", "l l"};
@@ -342,9 +341,14 @@ public class SoccerAgent extends Thread {
         for (Threshold th : f.thresholds) {
             FieldObject fo = model.flags.get(th.name);
             if (fo != null) {
-                if (fo.distance > th.max) {
-                    //System.err.println(th.name + " dist " + fo.distance + " dir "
-                    //       + fo.direction);
+                double adj = 0;
+                if(th.name.charAt(th.name.length()-1) == model.opp_field_side){
+                    adj = model.threshold_adjuster;
+                }else if(th.name.charAt(th.name.length()-1) == model.field_side){
+                    adj = -1*model.threshold_adjuster ;
+                }
+                
+                if (fo.distance > th.max - adj) {
                     if (Math.abs(fo.direction) < 88) {
                         if (fo.direction < 0) {
                             commands.add("(turn " + (fo.direction + 90) + ")");
@@ -354,7 +358,7 @@ public class SoccerAgent extends Thread {
                     }
                     commands.add("(dash 75)");
                     break;
-                } else if (fo.distance < th.min) {
+                } else if (fo.distance < th.min -adj) {
                     if (Math.abs(fo.direction) < 88) {
                         if (fo.direction < 0) {
                             commands.add("(turn " + (fo.direction - 90) + ")");
@@ -382,41 +386,43 @@ public class SoccerAgent extends Thread {
     private void getFreeAction() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
     /**
      * goes to the ball , will also somewhat intercept
      */
     private void goToBallAction() {
         if (Math.abs(model.ball.direction) > model.parameters[model.GTB_TURNBALLDIR] /*20*/) {
             //System.err.println("dir " + model.ball.direction + " dirChange " + model.ball.dirChange);
-            if (model.ball.dirChange != null ) {
-                commands.add("(turn " + (model.ball.direction + ( model.ball.dirChange)) + ")");
+            if (model.ball.dirChange != null) {
+                commands.add("(turn " + (model.ball.direction + (model.ball.dirChange)) + ")");
             } else {
                 commands.add("(turn " + model.ball.direction + ")");
             }
-        }else if (model.ball.distance > 0.7) {
-            if (model.ball.dirChange != null && Math.abs(model.ball.dirChange)>0.1 && Math.abs(model.ball.distChange)>0.1) {
-               double turnThis;
-                if(model.ball.distChange <-0.1){
-                    turnThis = (model.ball.direction + 
-                            2*(Math.toDegrees(Math.asin((model.ball.distance*Math.sin(Math.toRadians(model.ball.dirChange)))/Math.abs(model.ball.distChange)))));
-                }else{
-                    turnThis = 
-                        (model.ball.direction + 
-                                (Math.toDegrees(Math.asin((model.ball.distance*Math.sin(Math.toRadians(model.ball.dirChange)))/Math.abs(model.ball.distChange)))));
+        } else if (model.ball.distance > 0.7) {
+            if (model.ball.dirChange != null && Math.abs(model.ball.dirChange) > 0.1 && Math.abs(model.ball.distChange) > 0.1) {
+                double turnThis;
+                if (model.ball.distChange < -0.1) {
+                    turnThis = (model.ball.direction
+                            + 2 * (Math.toDegrees(Math.asin((model.ball.distance * Math.sin(Math.toRadians(model.ball.dirChange))) / Math.abs(model.ball.distChange)))));
+                } else {
+                    turnThis
+                            = (model.ball.direction
+                            + (Math.toDegrees(Math.asin((model.ball.distance * Math.sin(Math.toRadians(model.ball.dirChange))) / Math.abs(model.ball.distChange)))));
                 }
-                if(Double.isNaN(turnThis)){
+                if (Double.isNaN(turnThis)) {
                     //System.err.println("found NaN");
                     turnThis = model.ball.direction;
-                }else if(Math.abs(turnThis)>90){
-                    turnThis = Math.signum(turnThis)*90;
+                } else if (Math.abs(turnThis) > 90) {
+                    turnThis = Math.signum(turnThis) * 90;
                 }
-                commands.add("(dash " + 100 + " " +turnThis + ")");
+                commands.add("(dash " + 100 + " " + turnThis + ")");
                 //System.err.println(commands.peek());
             } else {
                 commands.add("(dash 95)");
             }
         }
     }
+
     /**
      * dribbles with the ball
      */
@@ -484,12 +490,14 @@ public class SoccerAgent extends Thread {
             }
         }
     }
+
     /**
      * not very intelligent
      */
     private void kickAction() {
         commands.add("(kick 100 " + (model.goal.direction + (r.nextInt(20) - 10)) + ")");
     }
+
     /**
      * not intelligent
      */
@@ -508,14 +516,16 @@ public class SoccerAgent extends Thread {
         double power = (2.5 * distance[rand]);
         commands.add("(kick " + (power > 100.0 ? 100.0 : power) + " " + degrees[rand] + ")");
     }
+
     /**
-     * 
+     *
      */
     private void catchAction() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
     /**
-     * 
+     *
      */
     private void lookForBallAction() {
         if (model.ballInVision) {
