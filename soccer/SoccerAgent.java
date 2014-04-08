@@ -234,7 +234,7 @@ public class SoccerAgent extends Thread {
 
                 if (th.name.charAt(th.name.length() - 1) == model.opp_field_side) {
                     if (model.ballInVision) {
-                        model.threshold_adjuster = (model.ball.distance - f.away_from_ball);
+                        model.threshold_adjuster = (model.ball.distance - f.away_from_ball) > 0 ? (model.ball.distance - f.away_from_ball) : 0;
                     }
                     if (fo.distance < th.min - model.threshold_adjuster || fo.distance > th.max - model.threshold_adjuster) {
                         ret++;
@@ -262,6 +262,8 @@ public class SoccerAgent extends Thread {
     }
 
     private int coverGEval() {
+    	if(!model.ballInVision) return 0;
+    	if(model.goalie) return 1;
         return 0;
     }
 
@@ -380,7 +382,49 @@ public class SoccerAgent extends Thread {
     }
 
     private void coverGAction() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    	char s = model.field_side;
+    	if(model.flags.containsKey("f p " + s + " c")) {	//center penalty
+    		if(model.flags.containsKey("f c")) {
+    			FieldObject fpxc = model.flags.get("f p " + s + " c");
+    			FieldObject fc = model.flags.get("f c");
+    			System.err.println("f p x c dist " + fpxc.distance + " dir " + fpxc.direction + ", f c dist " + fc.distance + " dir " + fc.direction);
+    			if(fc.direction - fpxc.direction > 1.0) commands.add("(dash 50 -90)");
+    			else if(fc.direction - fpxc.direction < -1.0) commands.add("(dash 50 90)");
+    			else if(fc.distance < 49) commands.add("(dash 50 180)");
+    			else if(fc.distance > 50) commands.add("(dash 50 )");
+    			return;
+    		}
+    	}
+    	else if(model.flags.containsKey("f p " + s + " b")) {	//bottom penalty
+    		/*if(model.flags.containsKey("f " + s + " b")) {
+    			
+    		} else*/ if(model.flags.containsKey("f b " + s + " 20")) {
+    			FieldObject fpxb = model.flags.get("f p " + s + " b");
+    			FieldObject fbx20 = model.flags.get("f b " + s + " 20");
+    			System.err.println("f p x b dist " + fpxb.distance + " dir " + fpxb.direction + ", f b x 20 dist " + fbx20.distance + " dir " + fbx20.direction);
+    			if(fbx20.direction - fpxb.direction > 1.0) commands.add("(dash 50 -90)");
+    			else if(fbx20.direction - fpxb.direction < -1.0) commands.add("(dash 50 90)");
+    			else if(fbx20.distance < 46) commands.add("(dash 50 180)");
+    			else if(fbx20.distance > 48) commands.add("(dash 50 0)");
+    			return;
+    		}
+    	}
+    	else if(model.flags.containsKey("f p " + s + " t")) {	//top penalty
+    		/*if(model.flags.containsKey("f " + s + " t")) {
+    			
+    		} else*/ if(model.flags.containsKey("f t " + s + " 20")) {
+    			FieldObject fpxt = model.flags.get("f p " + s + " t");
+    			FieldObject ftx20 = model.flags.get("f t " + s + " 20");
+    			System.err.println("f p x t dist " + fpxt.distance + " dir " + fpxt.direction + ", f t x 20 dist " + ftx20.distance + " dir " + ftx20.direction);
+    			if(ftx20.direction - fpxt.direction > 1.0) commands.add("(dash 50 -90)");
+    			else if(ftx20.direction - fpxt.direction < -1.0) commands.add("(dash 50 90)");
+    			else if(ftx20.distance < 46) commands.add("(dash 50 180)");
+    			else if(ftx20.distance > 48) commands.add("(dash 50 0)");
+    			return;
+    		}
+    	} 
+   		holdAction();
+    	//System.err.println("Goalie Cover Action");
     }
 
     private void getFreeAction() {
