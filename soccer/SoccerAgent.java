@@ -3,7 +3,6 @@ package soccer;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 
@@ -179,31 +178,38 @@ public class SoccerAgent extends Thread {
                         maxInt = i;
                     }
                 }
-                //System.err.println("doing");
+		//System.err.print(model.team+model.unum);
                 if (maxInt != -1) {
                     switch (maxInt) {
                         case (0):
+			    //System.err.println(" hold");
                             holdAction();
                             break;
                         case (1):
+			    //System.err.println(" cover");
                             coverPAction();
                             break;
                         case (2):
                             coverGAction();
                             break;
                         case (3):
+			    //System.err.println(" getFree");
                             getFreeAction();
                             break;
                         case (4):
+			    //System.err.println(" gotoball");
                             goToBallAction();
                             break;
                         case (5):
+			    //System.err.println(" dribble");
                             dribbleAction();
                             break;
                         case (6):
+			    //System.err.println(" kcik");
                             kickAction();
                             break;
                         case (7):
+			    //System.err.println(" pass");
                             passAction();
                             break;
                         case (8):
@@ -211,6 +217,7 @@ public class SoccerAgent extends Thread {
                             break;
                     }
                 } else {
+		    //System.err.println(" lookforball");
                     lookForBallAction();
                 }
                 if (!commands.isEmpty()) {
@@ -222,6 +229,10 @@ public class SoccerAgent extends Thread {
         System.err.println("quitting agent");
     }
 
+    /**
+     * evaluates if it should hold position
+     * @return 
+     */
     private int holdEval() {
         int ret = 0;
         //String[] lines = {"l t", "l b", "l r", "l l"};
@@ -231,6 +242,7 @@ public class SoccerAgent extends Thread {
 
             FieldObject fo = model.flags.get(th.name);
             if (fo != null) {
+		//System.err.println(th.name + " dist: " + fo.distance + " dir: " + fo.direction);
                 fo.distance = Math.abs(fo.distance * Math.sin(Math.toRadians(fo.direction)));
 
                 if (th.name.charAt(th.name.length() - 1) == model.opp_field_side) {
@@ -266,14 +278,18 @@ public class SoccerAgent extends Thread {
         if(model.lastKickCertainty && !model.ourTeamLastKick){
 
             for(Player pl: model.players){
-                if (!model.team.equals(pl.team) && pl.distance < 20) {
+                if (model.team!=null && !model.team.equals(pl.team) && pl.distance < 20) {
                     if(pl.distance < 3){
                         return 2;           //TODO some other value
                     }else{
                         double dPlD = pl.distance * 1.8;
                         for(Player pl1: model.players){
-                            if(model.team.equals(pl.team) && pl.distance < dPlD && proximityHelp(pl1.distance,pl1.direction,dPlD,pl.direction)){
-                                ret++;  //TODO something else
+                            if(model.team.equals(pl.team)){
+                                  if(pl.distance < dPlD && proximityHelp(pl1.distance,pl1.direction,dPlD,pl.direction)){
+				      
+				  }else{
+				      ret++;
+				  }
                             }
                         }
                     }
@@ -284,19 +300,20 @@ public class SoccerAgent extends Thread {
         return ret;
     }
 
-    
-    private boolean proximityHelp(double objDist, double objAngle, double toObjDist, double toObjDir){
-        return (((toObjDist * Math.pow(Math.abs(objAngle - toObjDir) / 90, 2.0))
-                            + objDist) < toObjDir);
-    }
-    
     private int coverGEval() {
         return 0;
     }
 
     private int getFreeEval() {
+	int ret = 0;
         if(model.lastKickCertainty && model.ourTeamLastKick){
-            
+            for(Player pl: model.players){
+		if(pl.team != null && !model.team.equals(pl.team)){
+		    if(model.ballInVision && pl.distance<model.ball.distance && Math.abs(pl.direction-model.ball.direction)<5){
+			ret++;
+		    }
+		}
+	    }
         }
         return 0;
     }
@@ -312,8 +329,9 @@ public class SoccerAgent extends Thread {
         for (Player pl : model.players) {
             if (model.team.equals(pl.team)) {
                 if (pl.distance < dBallDist) {
-                    if ( proximityHelp(pl.distance,pl.direction,dBallDist,model.ball.direction)){//      ((dBallDist * Math.pow(Math.abs(pl.direction - model.ball.direction) / 90, 2.0))
-                            //+ pl.distance) < dBallDist) {
+                    if ( proximityHelp(pl.distance,pl.direction,dBallDist,model.ball.direction)){
+//((dBallDist * Math.pow(Math.abs(pl.direction - model.ball.direction) / 90, 2.0))+ pl.distance) < dBallDist) {
+			
                         return 0; //TODO should make ret smaller rather than returning zero
                     }
                 }
@@ -330,7 +348,7 @@ public class SoccerAgent extends Thread {
     private double dribbleEval() {
         double ret = 1.0;
         for (Player pl : model.players) {
-            if (!model.team.equals(pl.team) && pl.distance < model.parameters[model.DRB_DIST_EVAL]) {
+            if (pl.team != null && !model.team.equals(pl.team) && pl.distance < model.parameters[model.DRB_DIST_EVAL]) {
                 return 0.5;
             }
         }
@@ -408,7 +426,27 @@ public class SoccerAgent extends Thread {
     }
 
     private void coverPAction() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	Player coverMe = null;
+        for(Player pl: model.players){
+                if (pl.team != null && !model.team.equals(pl.team) && pl.distance < 20) {
+                    if(pl.distance < 3){
+                        coverMe = pl;      
+			break;
+                    }else{
+                        double dPlD = pl.distance * 1.8;
+                        for(Player pl1: model.players){
+                            if(model.team.equals(pl.team) && pl.distance < dPlD && proximityHelp(pl1.distance,pl1.direction,dPlD,pl.direction)){
+                                coverMe = pl;
+				break;
+                            }
+                        }
+                    }
+                }
+            }
+	if(coverMe != null && coverMe.distance>0.7){
+	    commands.add("(dash 30 "+coverMe.direction+")");
+	}
+	
     }
 
     private void coverGAction() {
@@ -416,7 +454,22 @@ public class SoccerAgent extends Thread {
     }
 
     private void getFreeAction() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+	int opLeft = 0;
+	int opRight = 0;
+        for(Player pl: model.players){
+            if (pl.team != null && !model.team.equals(pl.team) && pl.distance < model.ball.distance) {
+		if(pl.direction>model.ball.direction){
+		    opRight++;
+		}else{
+		    opLeft++;
+		}
+	    }
+	}
+	if(opRight>opLeft){
+	    commands.add("(dash 40 -90)");
+	}else{
+	    commands.add("(dash 40 90)");
+	}
     }
 
     /**
@@ -565,5 +618,9 @@ public class SoccerAgent extends Thread {
         } else {
             commands.add("(turn 90)");
         }
+    }
+        
+    private boolean proximityHelp(double objDist, double objAngle, double toObjDist, double toObjDir){
+        return (((toObjDist * Math.pow(Math.abs(objAngle - toObjDir) / 90, 2.0))+ objDist) < toObjDist);
     }
 }
