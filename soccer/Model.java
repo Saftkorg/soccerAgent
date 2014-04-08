@@ -74,6 +74,8 @@ public class Model {
     String recMsg;
     HashMap<String, FieldObject> flags;
     List<Player> players;
+    boolean ourTeamLastKick;
+    boolean lastKickCertainty;
     Body body;
     FieldObject ball;
     FieldObject goal;
@@ -94,6 +96,7 @@ public class Model {
         time = -1;
         ballInVision = false;
         goalInVision = false;
+        lastKickCertainty = false;
         body = new Body();
         flags = new HashMap<>();
         players = new LinkedList<>();
@@ -279,6 +282,8 @@ public class Model {
                     if (values[values.length - 1].matches("t|k")) {
                         if (values[values.length - 1].equals("k")) {
                             p.kick = true;
+                            lastKickCertainty = true;
+                            ourTeamLastKick = p.team.equals(this.team);
                         } else {
                             p.tackle = true;
                         }

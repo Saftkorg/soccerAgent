@@ -3,6 +3,7 @@ package soccer;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 
@@ -234,13 +235,15 @@ public class SoccerAgent extends Thread {
 
                 if (th.name.charAt(th.name.length() - 1) == model.opp_field_side) {
                     if (model.ballInVision) {
-                        model.threshold_adjuster = (model.ball.distance - f.away_from_ball);
+                        model.threshold_adjuster = (model.ball.distance - f.away_from_ball)>0 ? (model.ball.distance - f.away_from_ball): 0;
+                        
                     }
                     if (fo.distance < th.min - model.threshold_adjuster || fo.distance > th.max - model.threshold_adjuster) {
                         ret++;
                     }
                     
                 } else if (th.name.charAt(th.name.length() - 1) == model.field_side) {
+                    
                     if (model.ballInVision) {
                         model.threshold_adjuster = 0;
 
@@ -258,14 +261,43 @@ public class SoccerAgent extends Thread {
     }
 
     private int coverPEval() {
-        return 0;
+        int ret = 0;
+        
+        if(model.lastKickCertainty && !model.ourTeamLastKick){
+
+            for(Player pl: model.players){
+                if (!model.team.equals(pl.team) && pl.distance < 20) {
+                    if(pl.distance < 3){
+                        return 2;           //TODO some other value
+                    }else{
+                        double dPlD = pl.distance * 1.8;
+                        for(Player pl1: model.players){
+                            if(model.team.equals(pl.team) && pl.distance < dPlD && proximityHelp(pl1.distance,pl1.direction,dPlD,pl.direction)){
+                                ret++;  //TODO something else
+                            }
+                        }
+                    }
+                }
+            }
+            
+        }
+        return ret;
     }
 
+    
+    private boolean proximityHelp(double objDist, double objAngle, double toObjDist, double toObjDir){
+        return (((toObjDist * Math.pow(Math.abs(objAngle - toObjDir) / 90, 2.0))
+                            + objDist) < toObjDir);
+    }
+    
     private int coverGEval() {
         return 0;
     }
 
     private int getFreeEval() {
+        if(model.lastKickCertainty && model.ourTeamLastKick){
+            
+        }
         return 0;
     }
 
@@ -280,8 +312,8 @@ public class SoccerAgent extends Thread {
         for (Player pl : model.players) {
             if (model.team.equals(pl.team)) {
                 if (pl.distance < dBallDist) {
-                    if (((dBallDist * Math.pow(Math.abs(pl.direction - model.ball.direction) / 90, 2.0))
-                            + pl.distance) < dBallDist) {
+                    if ( proximityHelp(pl.distance,pl.direction,dBallDist,model.ball.direction)){//      ((dBallDist * Math.pow(Math.abs(pl.direction - model.ball.direction) / 90, 2.0))
+                            //+ pl.distance) < dBallDist) {
                         return 0; //TODO should make ret smaller rather than returning zero
                     }
                 }

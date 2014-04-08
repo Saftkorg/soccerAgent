@@ -17,8 +17,8 @@ public class StartTeam {
 //		Runtime.getRuntime().exec("C:/Users/Viktor/rcssserver/rcssserver-15.0.0-win/rcssserver.exe", null, new File("C:/Users/Viktor/rcssserver/rcssserver-15.0.0-win"));
 //		Runtime.getRuntime().exec("C:/Users/Viktor/rcssserver/rcssmonitor-14.1.0-win/rcssmonitor.exe", null, new File("C:/Users/Viktor/rcssserver/rcssmonitor-14.1.0-win"));
       
-        ProcessBuilder pb = new ProcessBuilder("C:\\Users\\Alexander\\Documents\\Alex Skola\\kex\\rcssserver-15.0.0-win\\rcssserver.exe");
-       pb.directory(new File("C:\\Users\\Alexander\\Documents\\Alex Skola\\kex\\rcssserver-15.0.0-win\\"));
+        ProcessBuilder pb = new ProcessBuilder("C:\\Users\\Alexander\\Documents\\Skola\\kex\\rcssserver-15.0.0-win\\rcssserver.exe");
+       pb.directory(new File("C:\\Users\\Alexander\\Documents\\Skola\\kex\\rcssserver-15.0.0-win\\"));
         Process server = pb.start();
 //InputStream serverIS = server.getInputStream();
         //byte[] buffer = new byte[4096];
@@ -36,7 +36,7 @@ public class StartTeam {
        
        
         
-        Process monitor = new ProcessBuilder("C:\\Users\\Alexander\\Documents\\Alex Skola\\kex\\rcssmonitor-14.1.0-win\\rcssmonitor.exe").start();
+        Process monitor = new ProcessBuilder("C:\\Users\\Alexander\\Documents\\Skola\\kex\\rcssmonitor-14.1.0-win\\rcssmonitor.exe").start();
 
         String[] first = {"Learn", "localhost", "6000"};
         String[] second = {"Dumb", "localhost", "6000"};
