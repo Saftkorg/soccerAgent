@@ -27,6 +27,7 @@ public class Model {
     double[] nobArray = new double[9];
     int ballNotInVisionCount;
 
+
     //public enum Parameter {
      static final int FAR_BALL_DIST = 0;
 //        FAR_HOLDW,
@@ -357,4 +358,5 @@ public class Model {
         }
         flags.put(desc, f);
     }
+
 }

@@ -2,7 +2,6 @@ package soccer;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
@@ -68,6 +67,7 @@ public class StartTeam {
 	}
 
 	try {
+
 
 	    Thread.sleep(1 * 2 * 1000);
 	} catch (InterruptedException ex) {

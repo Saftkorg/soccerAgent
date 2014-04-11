@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
 
+
 /**
  * This is the main class of the RoboCup Soccer Agent
  * 
@@ -29,6 +30,7 @@ public class SoccerAgent extends Thread {
 	// int x;
 	// int y;
 	// boolean goalie;
+
 	/**
 	 * 
 	 * @param args
@@ -37,6 +39,7 @@ public class SoccerAgent extends Thread {
 	 * @throws UnknownHostException
 	 * @throws NumberFormatException
 	 */
+
 	public SoccerAgent(String[] args, Formation f)
 			throws NumberFormatException, UnknownHostException, SocketException {
 		commands = new LinkedList();
@@ -45,6 +48,7 @@ public class SoccerAgent extends Thread {
 		// y = f.y;
 		// goalie = f.goalie;
 		model = new Model(args[0], f.goalie);
+
 		com = new Communicator(args[1], Integer.parseInt(args[2]), model);
 
 	}
@@ -89,6 +93,7 @@ public class SoccerAgent extends Thread {
 
 	@Override
 	public void run() {
+
 
 		String msg;
 		int connectCount = 0;
@@ -250,6 +255,7 @@ public class SoccerAgent extends Thread {
 				if (!commands.isEmpty()) {
 					msg = commands.poll();
 				}
+
 			}
 		}
 		com.quit();
@@ -919,6 +925,7 @@ public class SoccerAgent extends Thread {
 			topDegree = top.direction;
 			botDegree = bot.direction;
 
+
 		} else {
 			double degree = Math.toDegrees(Math.asin(9 / model.ball.distance));
 			topDegree = model.goal.direction - degree;
@@ -1040,5 +1047,6 @@ public class SoccerAgent extends Thread {
 	private boolean proximityHelp(double objDist, double objAngle,
 			double toObjDist, double toObjDir) {
 		return (((toObjDist * Math.pow(Math.abs(objAngle - toObjDir) / 90, 2.0)) + objDist) < toObjDist);
+
 	}
 }
