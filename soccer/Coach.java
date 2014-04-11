@@ -8,7 +8,6 @@ package soccer;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -122,8 +121,7 @@ public class Coach extends Thread {
 				
 				reward += cm.timeInterval;
 			}
-			//if (cm.time >= 6000) {
-			if (cm.time >= 1000) {
+			if (cm.time >= 6000) {
 				cm.endPeriod();
 				break;
 			}

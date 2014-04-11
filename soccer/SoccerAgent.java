@@ -42,7 +42,7 @@ public class SoccerAgent extends Thread {
 
 	public SoccerAgent(String[] args, Formation f)
 			throws NumberFormatException, UnknownHostException, SocketException {
-		commands = new LinkedList();
+		commands = new LinkedList<String>();
 		this.f = f;
 		// x = f.x;
 		// y = f.y;
