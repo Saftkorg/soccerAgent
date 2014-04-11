@@ -1,10 +1,12 @@
 package soccer;
 
-public class Player {
+public class Player extends FieldObject{
 	String team;
-	int Unum;
-	int distance;
-	int degree;
-	int distanceChange;
-	int degreeChange;
+        Boolean goalie;
+	int unum;
+        int bodyFacingDir;
+        int headFacingDir;
+        int pointintDir;
+        Boolean tackle;
+        Boolean kick;
 }
