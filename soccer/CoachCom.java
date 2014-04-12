@@ -123,8 +123,10 @@ public class CoachCom{
         
         if(msg.contains("goal_"+model.teamSide)){
             model.score += model.goalScore;
+            model.ourGoals++;
         }else if(msg.contains("goal_")){
             model.score += model.oppGoalScore;
+            model.oppGoals++;
         }else if(msg.contains("free_kick_fault_"+model.teamSide) ||
                 msg.contains("back_pass_"+model.teamSide)){
             model.score--;

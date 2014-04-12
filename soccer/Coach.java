@@ -23,7 +23,7 @@ public class Coach extends Thread {
 	CoachCom cc;// = new CoachCom(coach[0], Integer.parseInt(coach[1]));
 	CoachModel cm;
 	private int matchNumber;
-	private String directory = "/home/alexander/Skola/kex/game";
+	private String directory = "C:\\Users\\Alexander\\Documents\\Skola\\kex\\game";
 
 	// while(
 
@@ -100,7 +100,7 @@ public class Coach extends Thread {
 		msg = "(eye on)";
 		int update = cm.timeInterval - 1;
 		int reward = cm.timeInterval;
-
+                boolean periodEnded= false;
 		while (cc.send(msg)) {
 			msg = null;
 			if (cm.halfTime) {
@@ -123,12 +123,17 @@ public class Coach extends Thread {
 			}
 			if (cm.time >= 6000) {
 				cm.endPeriod();
+                                periodEnded = true;
 				break;
 			}
 		}
+                if(!periodEnded){
+                    cm.endPeriod();
+                }
 		cc.quit();
 		
 		saveParams();
+                System.err.println("coach quitting");
 		
 	}
 
@@ -137,13 +142,14 @@ public class Coach extends Thread {
 		File f = new File(directory+matchNumber+".txt");
 		StringBuilder sb = new StringBuilder();
 		for (CoachModel.ParamElement pe : cm.paramList) {
-			sb.append(pe.value);
+			sb.append((double)Math.round(pe.value*100)/100);
 			sb.append("_");
 		}
 		sb.deleteCharAt(sb.lastIndexOf("_"));
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(f));
 			bw.write(sb.toString());
+                        bw.write("\n" + cm.teamName + cm.ourGoals +" opponent " + cm.oppGoals);
 			bw.flush();
 			bw.close();
 		} catch (IOException e) {

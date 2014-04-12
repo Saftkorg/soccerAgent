@@ -29,6 +29,8 @@ public class CoachModel {
     List<ParamElement> paramList = new LinkedList<>();
 	public boolean halfTime = false;
 	public boolean quit = false;
+    int oppGoals = 0;
+    int ourGoals = 0;
     
     
     CoachModel(){
@@ -80,7 +82,7 @@ public class CoachModel {
     String getValues() {
         StringBuilder sb = new StringBuilder();
         for(ParamElement pe : paramList){
-            sb.append(pe.nextValue());
+            sb.append((double)Math.round(pe.nextValue()*100)/100);
             sb.append("+");     
         }
         sb.deleteCharAt(sb.length()-1);
